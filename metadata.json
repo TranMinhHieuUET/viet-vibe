@@ -1,0 +1,7 @@
+{
+  "name": "Việt phục Remix - Phối Đồ Cổ Phục & Hiện Đại",
+  "description": "Ứng dụng phối đồ phong cách Việt phục truyền thống kết hợp thời trang hiện đại Gen Z với hệ thống cảnh báo quy chuẩn văn hóa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
