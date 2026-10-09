@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+@theme {
+  --font-serif: "Lora", "Be Vietnam Pro", serif;
+  --font-sans: "Be Vietnam Pro", "Plus Jakarta Sans", sans-serif;
+}
+
+@layer base {
+  html, body {
+    font-family: "Be Vietnam Pro", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .font-serif {
+    font-family: "Lora", "Be Vietnam Pro", serif !important;
+  }
+}
