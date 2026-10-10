@@ -37,7 +37,22 @@ import {
   Share2,
   Copy,
   Trash2,
-  Heart
+  Heart,
+  Users,
+  MessageSquare,
+  Send,
+  ShoppingBag,
+  Navigation,
+  Phone,
+  Tag,
+  Bot,
+  Store,
+  Clock,
+  Compass,
+  MessageCircle,
+  Plus,
+  Wand2,
+  Edit2
 } from 'lucide-react';
 
 // ==========================================
@@ -1436,9 +1451,19 @@ interface EpicLibraryViewProps {
   selectedId: string;
   onSelectId: (id: string) => void;
   onEquipItem: (item: CulturalItem) => void;
+  onBackToMixMatch?: () => void;
+  hasInProgressOutfit?: boolean;
+  currentOutfitDesc?: string;
 }
 
-function EpicLibraryView({ selectedId, onSelectId, onEquipItem }: EpicLibraryViewProps) {
+function EpicLibraryView({ 
+  selectedId, 
+  onSelectId, 
+  onEquipItem,
+  onBackToMixMatch,
+  hasInProgressOutfit,
+  currentOutfitDesc
+}: EpicLibraryViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'ao' | 'quan' | 'phukien' | 'giay'>('all');
 
@@ -1466,34 +1491,58 @@ function EpicLibraryView({ selectedId, onSelectId, onEquipItem }: EpicLibraryVie
 
   const currentItem = culturalDatabase[selectedId] || filteredItems[0] || ALL_ITEMS[0];
 
+  // Chuẩn bị ID trang phục để render hình minh họa AvatarComposite
+  const previewTopId = currentItem.category === 'ao' ? currentItem.id : 'ao_ngu_than';
+  const previewBottomId = currentItem.category === 'quan' ? currentItem.id : 'quan_lua';
+  const previewShoeId = currentItem.category === 'giay' ? currentItem.id : 'hai_theu';
+  const previewAccIds = currentItem.category === 'phukien' ? [currentItem.id] : [];
+
   return (
     <div className="flex-1 max-w-7xl w-full mx-auto p-3 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-fadeIn">
-      {/* CỘT TRÁI (30% ~ 4/12): DANH SÁCH MÓN ĐỒ & THANH TÌM KIẾM */}
-      <section className="lg:col-span-4 bg-white rounded-3xl border border-neutral-200 p-4 shadow-sm flex flex-col h-full lg:sticky lg:top-20">
-        <div className="flex items-center justify-between pb-3 border-b border-neutral-100 mb-3">
+      {/* CỘT TRÁI (30% ~ 4/12): DANH SÁCH MÓN ĐỒ & THANH TÌM KIẾM - CỐ ĐỊNH MỤC LỤC SỬ THI */}
+      <section className="lg:col-span-4 bg-white/90 backdrop-blur-md rounded-3xl border border-amber-900/10 p-4 shadow-md flex flex-col lg:sticky lg:top-20 lg:h-[calc(100vh-6.5rem)] lg:max-h-[calc(100vh-6.5rem)] z-10">
+        {/* Banner quay lại bản phối dở nếu có */}
+        {hasInProgressOutfit && onBackToMixMatch && (
+          <div className="mb-3 p-2.5 rounded-2xl bg-amber-50 border border-amber-300/80 flex items-center justify-between gap-2 shrink-0 animate-fadeIn">
+            <div className="min-w-0 text-[11px]">
+              <span className="font-bold text-neutral-900 block truncate">
+                Đang phối dở: <span className="text-rose-800">{currentOutfitDesc}</span>
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={onBackToMixMatch}
+              className="px-2.5 py-1 rounded-lg bg-neutral-900 text-amber-300 text-[11px] font-bold shrink-0 hover:bg-black transition cursor-pointer"
+            >
+              Phối tiếp ↗
+            </button>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-100 mb-3 shrink-0">
           <div className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-rose-800" />
             <h2 className="text-base font-bold text-neutral-900 font-serif">Mục lục Sử thi</h2>
           </div>
-          <span className="text-[11px] font-semibold px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-full">
+          <span className="text-[11px] font-bold px-2.5 py-0.5 bg-[#FAF6EE] text-amber-900 border border-amber-900/15 rounded-full">
             {filteredItems.length} món đồ
           </span>
         </div>
 
         {/* Thanh tìm kiếm */}
-        <div className="relative mb-3">
+        <div className="relative mb-3 shrink-0">
           <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm theo tên, triều đại, nguồn học thuật..."
-            className="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-neutral-50 border border-neutral-200 focus:bg-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition outline-none"
+            className="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-[#FAF6EE] border border-amber-900/15 focus:bg-white focus:border-rose-600 focus:ring-1 focus:ring-rose-500/20 transition outline-none"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-600"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-600 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -1501,7 +1550,7 @@ function EpicLibraryView({ selectedId, onSelectId, onEquipItem }: EpicLibraryVie
         </div>
 
         {/* Bộ lọc danh mục */}
-        <div className="flex flex-wrap gap-1 mb-3 pb-3 border-b border-neutral-100 text-xs">
+        <div className="flex flex-wrap gap-1 mb-3 pb-3 border-b border-neutral-100 text-xs shrink-0">
           {[
             { id: 'all', label: 'Tất cả' },
             { id: 'ao', label: 'Áo' },
@@ -1512,9 +1561,9 @@ function EpicLibraryView({ selectedId, onSelectId, onEquipItem }: EpicLibraryVie
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id as any)}
-              className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer text-[11px] ${
+              className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer text-[11px] active:scale-95 ${
                 selectedCategory === cat.id
-                  ? 'bg-rose-900 text-white shadow-xs'
+                  ? 'bg-neutral-900 text-amber-300 shadow-xs'
                   : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
               }`}
             >
@@ -1523,8 +1572,8 @@ function EpicLibraryView({ selectedId, onSelectId, onEquipItem }: EpicLibraryVie
           ))}
         </div>
 
-        {/* Danh sách items cuộn mượt mà */}
-        <div className="space-y-1.5 overflow-y-auto max-h-[520px] pr-1">
+        {/* Danh sách items cuộn mượt mà trong khung cố định */}
+        <div className="space-y-1.5 overflow-y-auto flex-1 pr-1">
           {filteredItems.length === 0 ? (
             <div className="p-6 text-center text-xs text-neutral-400">
               Không tìm thấy trang phục phù hợp với từ khóa "{searchQuery}"
@@ -1573,211 +1622,192 @@ function EpicLibraryView({ selectedId, onSelectId, onEquipItem }: EpicLibraryVie
         </div>
       </section>
 
-      {/* CỘT PHẢI (70% ~ 8/12): HIỂN THỊ CHI TIẾT TOÀN BỘ 14 TRƯỜNG THÔNG TIN */}
-      <section className="lg:col-span-8 bg-white rounded-3xl border border-neutral-200 p-5 lg:p-8 shadow-sm space-y-6">
-        {/* HERO CARD HEADER (name, id, altNames, targetUser, region) */}
-        <div className="pb-6 border-b border-neutral-100">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-100 text-rose-900 border border-rose-200">
-                {currentItem.category === 'ao' ? 'Thượng phục (Áo)' : currentItem.category === 'quan' ? 'Hạ phục (Quần/Váy)' : currentItem.category === 'phukien' ? 'Phụ kiện' : 'Hài lý (Giày dép)'}
-              </span>
-              <span className="font-mono text-[11px] text-neutral-500 px-2 py-0.5 bg-neutral-100 rounded-md">
-                ID: {currentItem.id}
-              </span>
+      {/* CỘT PHẢI (70% ~ 8/12): GIAO DIỆN TẠP CHÍ DI SẢN (EDITORIAL & CÓ HÌNH MINH HỌA) */}
+      <section className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl border border-amber-900/10 p-5 lg:p-8 shadow-md space-y-6">
+        {/* HERO SHOWCASE: HÌNH MINH HỌA & THÔNG TIN CHÍNH */}
+        <div className="pb-6 border-b border-neutral-100 flex flex-col sm:flex-row items-start gap-6">
+          {/* HÌNH MINH HỌA CỔ PHỤC (AVATAR COMPOSITE SHOWCASE) */}
+          <div className="w-full sm:w-44 md:w-52 aspect-[1/1.7] rounded-2xl bg-gradient-to-b from-[#FAF8F5] via-[#F5EFEB] to-[#ECE5DC] border border-amber-900/15 p-2 relative shrink-0 shadow-inner flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(#b45309_0.75px,transparent_0.75px)] [background-size:14px_14px] opacity-15 pointer-events-none" />
+            <AvatarComposite
+              topId={previewTopId}
+              bottomId={previewBottomId}
+              shoeId={previewShoeId}
+              accessoryIds={previewAccIds}
+              topColorHex="#7B1113"
+              bottomColorHex="#FAF6EE"
+              gender="female"
+              className="w-full h-full"
+            />
+            <div className="absolute bottom-2 inset-x-2 px-2 py-0.5 rounded-lg bg-black/60 backdrop-blur-xs text-white text-[10px] text-center font-medium">
+              Minh họa phục dựng
             </div>
-            {/* Nút bấm thử món này trên Avatar ngay */}
-            <button
-              type="button"
-              onClick={() => onEquipItem(currentItem)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-rose-800 to-amber-700 hover:from-rose-900 hover:to-amber-800 text-white text-xs font-bold shadow-sm transition transform active:scale-95 cursor-pointer"
-            >
-              <Shirt className="w-3.5 h-3.5" />
-              <span>Phối món này trên Avatar</span>
-            </button>
           </div>
 
-          <h1 className="text-2xl lg:text-3xl font-bold font-serif text-neutral-900 tracking-tight mb-2">
-            {currentItem.name}
-          </h1>
-
-          {/* 2. altNames */}
-          {currentItem.altNames && currentItem.altNames.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 mb-4">
-              <span className="text-xs text-neutral-400 font-medium">Tên gọi khác:</span>
-              {currentItem.altNames.map((alt, idx) => (
-                <span key={idx} className="text-xs px-2.5 py-0.5 bg-neutral-100 text-neutral-700 rounded-md italic">
-                  "{alt}"
+          {/* THÔNG TIN ĐẦU MỤC */}
+          <div className="flex-1 min-w-0 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-100 text-rose-900 border border-rose-200">
+                  {currentItem.category === 'ao' ? 'Thượng phục (Áo)' : currentItem.category === 'quan' ? 'Hạ phục (Quần/Váy)' : currentItem.category === 'phukien' ? 'Phụ kiện' : 'Hài lý (Giày dép)'}
                 </span>
-              ))}
-            </div>
-          )}
+                <span className="font-mono text-[11px] text-neutral-500 px-2 py-0.5 bg-neutral-100 rounded-md">
+                  ID: {currentItem.id}
+                </span>
+              </div>
 
-          {/* Quick Stats Grid: 3. period, 4. dynasty, 5. region, 6. targetUser */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="p-3 bg-neutral-50 rounded-2xl border border-neutral-100">
-              <span className="text-[10px] text-neutral-400 font-medium uppercase tracking-wider block mb-0.5">Thời kỳ (Period)</span>
-              <span className="text-xs font-bold text-neutral-800 block">{currentItem.period}</span>
+              {/* Nút hành động */}
+              <div className="flex items-center gap-2">
+                {hasInProgressOutfit && onBackToMixMatch && (
+                  <button
+                    type="button"
+                    onClick={onBackToMixMatch}
+                    className="px-3 py-2 rounded-xl text-xs font-semibold text-neutral-700 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 transition cursor-pointer"
+                  >
+                    Quay lại bản phối dở
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onEquipItem(currentItem)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-800 to-amber-700 hover:from-rose-900 hover:to-amber-800 text-white text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer"
+                >
+                  <Shirt className="w-3.5 h-3.5" />
+                  <span>Phối món này trên Avatar</span>
+                </button>
+              </div>
             </div>
-            <div className="p-3 bg-neutral-50 rounded-2xl border border-neutral-100">
-              <span className="text-[10px] text-neutral-400 font-medium uppercase tracking-wider block mb-0.5">Triều đại (Dynasty)</span>
-              <span className="text-xs font-bold text-neutral-800 block">{currentItem.dynasty || 'Dân gian truyền thống'}</span>
-            </div>
-            <div className="p-3 bg-neutral-50 rounded-2xl border border-neutral-100">
-              <span className="text-[10px] text-neutral-400 font-medium uppercase tracking-wider block mb-0.5">Khu vực (Region)</span>
-              <span className="text-xs font-bold text-neutral-800 block">{currentItem.region}</span>
-            </div>
-            <div className="p-3 bg-neutral-50 rounded-2xl border border-neutral-100">
-              <span className="text-[10px] text-neutral-400 font-medium uppercase tracking-wider block mb-0.5">Đối tượng (User)</span>
-              <span className="text-xs font-bold text-neutral-800 block">{currentItem.targetUser}</span>
+
+            <h1 className="text-2xl lg:text-3xl font-bold font-serif text-neutral-900 tracking-tight">
+              {currentItem.name}
+            </h1>
+
+            {currentItem.altNames && currentItem.altNames.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 text-xs text-neutral-500">
+                <span className="font-medium text-neutral-400">Tên gọi khác:</span>
+                {currentItem.altNames.map((alt, idx) => (
+                  <span key={idx} className="italic text-neutral-700 bg-neutral-100 px-2 py-0.5 rounded-md">
+                    "{alt}"
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* THẺ TÓM LƯỢC NHANH ĐỂ ĐỌC LƯỚT */}
+            <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-amber-900/10">
+                <span className="text-[10px] text-neutral-400 uppercase font-bold block">Triều đại</span>
+                <span className="text-xs font-bold text-neutral-800 truncate block">{currentItem.dynasty || 'Dân gian truyền thống'}</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-amber-900/10">
+                <span className="text-[10px] text-neutral-400 uppercase font-bold block">Niên đại</span>
+                <span className="text-xs font-bold text-neutral-800 truncate block">{currentItem.period}</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-amber-900/10">
+                <span className="text-[10px] text-neutral-400 uppercase font-bold block">Khu vực</span>
+                <span className="text-xs font-bold text-neutral-800 truncate block">{currentItem.region}</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-amber-900/10">
+                <span className="text-[10px] text-neutral-400 uppercase font-bold block">Đối tượng mặc</span>
+                <span className="text-xs font-bold text-neutral-800 truncate block">{currentItem.targetUser}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 10. BỐI CẢNH LỊCH SỬ (HISTORICAL CONTEXT) */}
-        <div className="p-5 bg-gradient-to-br from-amber-50/70 to-orange-50/30 rounded-2xl border border-amber-200/80">
-          <div className="flex items-center gap-2 mb-2 text-amber-900 font-serif font-bold text-sm">
-            <Landmark className="w-4 h-4 text-amber-800" />
-            <span>Bối cảnh lịch sử & Khởi nguyên di sản (Historical Context)</span>
+        {/* BỐI CẢNH LỊCH SỬ & KHỞI NGUYÊN DI SẢN (THIẾT KẾ ĐỌC LƯỚT RÕ RÀNG) */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-rose-900 font-serif font-bold text-sm">
+            <Landmark className="w-4 h-4 text-rose-700" />
+            <span>Bối cảnh lịch sử & Khởi nguyên di sản</span>
           </div>
-          <p className="text-xs sm:text-sm text-neutral-800 leading-relaxed font-serif">
+          <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed font-serif pl-3.5 border-l-2 border-rose-800/40 py-1 bg-amber-50/20 rounded-r-xl">
             {currentItem.historicalContext}
           </p>
         </div>
 
-        {/* 11 & 13. ĐẶC ĐIỂM NHẬN DIỆN & Ý NGHĨA VĂN HÓA */}
+        {/* ĐẶC ĐIỂM CẮT MAY & Ý NGHĨA VĂN HÓA */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* 11. visualTraits */}
-          <div className="p-5 bg-neutral-50 rounded-2xl border border-neutral-200">
-            <div className="flex items-center gap-2 mb-2 text-neutral-900 font-bold text-xs uppercase tracking-wider">
-              <Scissors className="w-4 h-4 text-neutral-700" />
-              <span>Đặc điểm nhận diện & Cắt may (Visual Traits)</span>
+          <div className="space-y-1.5 p-4 rounded-2xl bg-neutral-50/80 border border-neutral-200/70">
+            <div className="flex items-center gap-2 text-neutral-900 font-bold text-xs uppercase tracking-wider">
+              <Scissors className="w-3.5 h-3.5 text-neutral-600" />
+              <span>Đặc điểm nhận diện & Cắt may</span>
             </div>
-            <p className="text-xs text-neutral-700 leading-relaxed">
+            <p className="text-xs text-neutral-600 leading-relaxed">
               {currentItem.visualTraits}
             </p>
           </div>
 
-          {/* 13. culturalSignificance */}
-          <div className="p-5 bg-rose-50/50 rounded-2xl border border-rose-200/80">
-            <div className="flex items-center gap-2 mb-2 text-rose-900 font-bold text-xs uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 text-rose-700" />
-              <span>Ý nghĩa văn hóa & Triết lý mỹ học (Cultural Significance)</span>
+          <div className="space-y-1.5 p-4 rounded-2xl bg-rose-50/40 border border-rose-200/60">
+            <div className="flex items-center gap-2 text-rose-900 font-bold text-xs uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-rose-700" />
+              <span>Ý nghĩa văn hóa & Mỹ học</span>
             </div>
-            <p className="text-xs text-neutral-800 leading-relaxed">
+            <p className="text-xs text-neutral-700 leading-relaxed">
               {currentItem.culturalSignificance}
             </p>
           </div>
         </div>
 
-        {/* 12, 7, 8. CÁCH PHỐI TRUYỀN THỐNG, TẦNG LỚP & HOÀN CẢNH */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* 12. traditionalPairing */}
-          <div className="p-4 rounded-2xl border border-neutral-200 bg-white">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 block mb-2">
-              Lối phối truyền thống
+        {/* LỐI PHỐI TRUYỀN THỐNG & QUY TẮC AN TOÀN */}
+        <div className="space-y-3 p-4 rounded-2xl bg-[#FAF6EE] border border-amber-900/10">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-800">
+              Lối phối truyền thống & Quy chuẩn
             </span>
-            <div className="flex flex-wrap gap-1.5">
-              {currentItem.traditionalPairing?.map((pair, idx) => (
-                <span key={idx} className="text-xs px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-800 font-medium">
-                  • {pair}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* 7. socialClass */}
-          <div className="p-4 rounded-2xl border border-neutral-200 bg-white">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 block mb-2">
-              Tầng lớp xã hội (Social Class)
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {currentItem.socialClass?.map((sc, idx) => (
-                <span key={idx} className="text-xs px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200/60 font-medium">
-                  {sc}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* 8. occasions */}
-          <div className="p-4 rounded-2xl border border-neutral-200 bg-white">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 block mb-2">
-              Hoàn cảnh sử dụng (Occasions)
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {currentItem.occasions?.map((occ, idx) => (
-                <span key={idx} className="text-xs px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-700 font-medium">
-                  {occ}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* 14. QUY TẮC TƯƠNG THÍCH & CẢNH BÁO KIÊNG KỴ (RULES OBJECT) */}
-        <div className="p-5 rounded-2xl border border-neutral-200 bg-neutral-50/70 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-900">
-              <ShieldAlert className="w-4 h-4 text-neutral-700" />
-              <span>Quy tắc tương thích & Hệ thống Advisor (Rules)</span>
-            </div>
-            {/* Tags */}
             <div className="flex flex-wrap gap-1">
               {currentItem.rules?.tags?.map((t, idx) => (
-                <span key={idx} className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-200/80 text-neutral-700">
+                <span key={idx} className="text-[10px] font-mono px-2 py-0.5 rounded bg-white border border-amber-900/10 text-neutral-600">
                   #{t}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Forbidden Pairs */}
-          <div>
-            <span className="text-xs text-neutral-500 block mb-1 font-medium">
-              Các món đồ kiêng kỵ khi phối cùng (forbiddenPairs):
-            </span>
-            {currentItem.rules?.forbiddenPairs && currentItem.rules.forbiddenPairs.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {currentItem.rules.forbiddenPairs.map(forbiddenId => {
-                  const forbiddenItem = culturalDatabase[forbiddenId];
-                  return (
-                    <span 
-                      key={forbiddenId}
-                      className="text-xs px-2.5 py-1 rounded-lg bg-rose-100 text-rose-900 font-semibold border border-rose-200 flex items-center gap-1"
-                    >
-                      <X className="w-3 h-3 text-rose-600" />
-                      <span>{forbiddenItem?.name || forbiddenId}</span>
-                    </span>
-                  );
-                })}
-              </div>
-            ) : (
-              <span className="text-xs text-emerald-700 font-medium">
-                ✓ Linh hoạt, không có danh sách đại kỵ nghiêm ngặt.
+          <div className="flex flex-wrap gap-1.5 items-center">
+            <span className="text-[11px] text-neutral-500 font-medium">Khuyên phối cùng:</span>
+            {currentItem.traditionalPairing?.map((pair, idx) => (
+              <span key={idx} className="text-xs px-2.5 py-0.5 rounded-lg bg-white border border-neutral-200 text-neutral-800 font-medium">
+                ✓ {pair}
               </span>
-            )}
+            ))}
           </div>
 
-          {/* Conflict Message */}
-          {currentItem.rules?.conflictMessage && (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-950 font-medium leading-relaxed">
-              {currentItem.rules.conflictMessage}
+          {currentItem.rules?.forbiddenPairs && currentItem.rules.forbiddenPairs.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 items-center pt-2 border-t border-amber-900/10">
+              <span className="text-[11px] text-rose-700 font-semibold">Cần tránh phối cùng:</span>
+              {currentItem.rules.forbiddenPairs.map(forbiddenId => {
+                const forbiddenItem = culturalDatabase[forbiddenId];
+                return (
+                  <span 
+                    key={forbiddenId}
+                    className="text-xs px-2 py-0.5 rounded-lg bg-rose-100 text-rose-900 font-semibold border border-rose-200"
+                  >
+                    ✕ {forbiddenItem?.name || forbiddenId}
+                  </span>
+                );
+              })}
             </div>
+          )}
+
+          {currentItem.rules?.conflictMessage && (
+            <p className="text-xs text-rose-800 italic bg-white/80 p-2.5 rounded-xl border border-rose-200/60">
+              💡 Lưu ý: {currentItem.rules.conflictMessage}
+            </p>
           )}
         </div>
 
-        {/* 14. NGUỒN TÀI LIỆU HỌC THUẬT (ACADEMIC SOURCES) */}
-        <div className="pt-4 border-t border-neutral-100">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-700 mb-2">
-            <BookOpen className="w-4 h-4 text-neutral-500" />
-            <span>Nguồn thư tịch & Khảo cứu học thuật uy tín (Academic Sources)</span>
+        {/* NGUỒN TÀI LIỆU HỌC THUẬT */}
+        <div className="pt-2">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Nguồn tài liệu khảo cứu</span>
           </div>
-          <div className="space-y-1.5 text-xs text-neutral-600">
+          <div className="space-y-1 text-[11px] text-neutral-500">
             {currentItem.academicSources?.map((source, idx) => (
-              <div key={idx} className="flex items-center gap-2">
+              <div key={idx} className="flex items-baseline gap-1.5">
                 <span className="text-rose-700 font-bold">[{idx + 1}]</span>
-                <span className="font-serif italic text-neutral-800">{source}</span>
+                <span className="font-serif italic text-neutral-700">{source}</span>
               </div>
             ))}
           </div>
@@ -1859,6 +1889,7 @@ export function AvatarComposite({
 interface ComparisonModalProps {
   draftA: OutfitState;
   draftB: OutfitState;
+  contextEvent?: string;
   onSelectOutfit: (outfit: OutfitState) => void;
   onClose: () => void;
   onClearDrafts: () => void;
@@ -1867,6 +1898,7 @@ interface ComparisonModalProps {
 export function ComparisonModal({
   draftA,
   draftB,
+  contextEvent,
   onSelectOutfit,
   onClose,
   onClearDrafts
@@ -1881,30 +1913,163 @@ export function ComparisonModal({
   const itemShoeB = culturalDatabase[draftB.shoes];
   const harmonyB = evaluateColorHarmony(draftB.topColor, draftB.bottomColor);
 
+  const [aiAnalysis, setAiAnalysis] = useState<{
+    overview?: string;
+    outfitA?: { vibe: string; strengths: string[]; bestOccasion: string };
+    outfitB?: { vibe: string; strengths: string[]; bestOccasion: string };
+    verdict?: string;
+  } | null>(null);
+  const [isLoadingAi, setIsLoadingAi] = useState<boolean>(true);
+
+  // Khóa nhận diện duy nhất cho cặp so sánh hiện tại để tránh gọi trùng lặp
+  const comparisonKey = React.useMemo(() => {
+    const a = `${draftA.top}_${draftA.topColor?.hex || ''}_${draftA.bottom}_${draftA.bottomColor?.hex || ''}_${draftA.shoes}_${(draftA.accessories || []).join(',')}`;
+    const b = `${draftB.top}_${draftB.topColor?.hex || ''}_${draftB.bottom}_${draftB.bottomColor?.hex || ''}_${draftB.shoes}_${(draftB.accessories || []).join(',')}`;
+    return `${a}_VS_${b}_CTX_${contextEvent || 'default'}`;
+  }, [
+    draftA.top,
+    draftA.topColor?.hex,
+    draftA.bottom,
+    draftA.bottomColor?.hex,
+    draftA.shoes,
+    draftA.accessories,
+    draftB.top,
+    draftB.topColor?.hex,
+    draftB.bottom,
+    draftB.bottomColor?.hex,
+    draftB.shoes,
+    draftB.accessories,
+    contextEvent
+  ]);
+
+  const clientCacheRef = React.useRef<Record<string, any>>({});
+  const lastFetchedKeyRef = React.useRef<string>('');
+
+  const fetchComparisonAnalysis = React.useCallback(async (force = false) => {
+    // Nếu đã có cache và không yêu cầu cưỡng chế tải lại
+    if (!force && clientCacheRef.current[comparisonKey]) {
+      setAiAnalysis(clientCacheRef.current[comparisonKey]);
+      setIsLoadingAi(false);
+      lastFetchedKeyRef.current = comparisonKey;
+      return;
+    }
+
+    // Tránh gửi liên tiếp khi đang phân tích cùng 1 cấu hình
+    if (!force && lastFetchedKeyRef.current === comparisonKey) {
+      return;
+    }
+
+    lastFetchedKeyRef.current = comparisonKey;
+    setIsLoadingAi(true);
+    try {
+      const res = await fetch('/api/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          outfitA: {
+            top: draftA.top,
+            topName: itemTopA?.name || draftA.top,
+            topColor: draftA.topColor,
+            bottom: draftA.bottom,
+            bottomName: itemBottomA?.name || draftA.bottom,
+            bottomColor: draftA.bottomColor,
+            shoes: draftA.shoes,
+            shoeName: itemShoeA?.name || draftA.shoes,
+            accessories: draftA.accessories,
+            accessoryNames: draftA.accessories.map(id => culturalDatabase[id]?.name || id),
+            gender: draftA.gender,
+            harmonyTitle: harmonyA.title,
+          },
+          outfitB: {
+            top: draftB.top,
+            topName: itemTopB?.name || draftB.top,
+            topColor: draftB.topColor,
+            bottom: draftB.bottom,
+            bottomName: itemBottomB?.name || draftB.bottom,
+            bottomColor: draftB.bottomColor,
+            shoes: draftB.shoes,
+            shoeName: itemShoeB?.name || draftB.shoes,
+            accessories: draftB.accessories,
+            accessoryNames: draftB.accessories.map(id => culturalDatabase[id]?.name || id),
+            gender: draftB.gender,
+            harmonyTitle: harmonyB.title,
+          },
+          contextEvent: contextEvent || 'Lựa chọn phong cách Việt Phục',
+        }),
+      });
+
+      if (!res.ok) throw new Error('API compare error');
+      const data = await res.json();
+      if (data.success && data.comparison) {
+        clientCacheRef.current[comparisonKey] = data.comparison;
+        setAiAnalysis(data.comparison);
+      } else {
+        throw new Error('Comparison data invalid');
+      }
+    } catch {
+      // Fallback thông minh am hiểu di sản văn hóa
+      const fallbackAnalysis = {
+        overview: `Phương án A (${itemTopA?.name || 'Set A'}) chuẩn chỉ lễ nghi truyền thống, trong khi Phương án B (${itemTopB?.name || 'Set B'}) mang đậm tinh thần remix năng động của thế hệ Gen Z.`,
+        outfitA: {
+          vibe: 'Cổ Điển Di Sản & Lễ Nghi',
+          strengths: [
+            `Tôn vinh chuẩn mực của ${itemTopA?.name || 'áo cổ phục'}`,
+            `Hài hòa màu sắc ${draftA.topColor.name} + ${draftA.bottomColor.name} tao nhã`,
+            `Phù hợp các không gian linh thiêng, lễ bái hoặc cưới hỏi`
+          ],
+          bestOccasion: 'Dâng hương lễ chùa, sự kiện cưới hỏi, chụp ảnh cổ phong truyền thống'
+        },
+        outfitB: {
+          vibe: 'Gen Z Remix Thời Thượng',
+          strengths: [
+            `Phom dáng hạ phục ${itemBottomB?.name || 'hiện đại'} phóng khoáng, dễ vận động`,
+            `Giao thoa hoàn hảo giữa nét cổ kính và tinh thần streetwear`,
+            `Tạo điểm nhấn phong cách cá tính không lẫn vào đâu`
+          ],
+          bestOccasion: 'Dạo phố cuối tuần, check-in cà phê, concert hay sự kiện nghệ thuật'
+        },
+        verdict: `Nếu bạn cần sự đoan trang, lịch thiệp và đúng chuẩn phép tắc di sản: Hãy chọn Phương án A. Nếu bạn muốn bộc lộ phong cách tự tin, trẻ trung và thoải mái bước đi: Phương án B là người bạn đồng hành hoàn hảo!`
+      };
+      clientCacheRef.current[comparisonKey] = fallbackAnalysis;
+      setAiAnalysis(fallbackAnalysis);
+    } finally {
+      setIsLoadingAi(false);
+    }
+  }, [comparisonKey, draftA, draftB, contextEvent, itemTopA?.name, itemBottomA?.name, itemShoeA?.name, harmonyA.title, itemTopB?.name, itemBottomB?.name, itemShoeB?.name, harmonyB.title]);
+
+  React.useEffect(() => {
+    fetchComparisonAnalysis(false);
+  }, [fetchComparisonAnalysis]);
+
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-6 bg-neutral-900/60 backdrop-blur-sm animate-fadeIn overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-5xl w-full p-4 sm:p-7 shadow-2xl border border-neutral-200 relative animate-scaleUp my-auto max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-neutral-900/60 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+      <div className="bg-white rounded-3xl max-w-5xl w-full p-4 sm:p-6 md:p-7 shadow-2xl border border-neutral-200 relative animate-scaleUp my-auto max-h-[94vh] flex flex-col">
         {/* Header Modal */}
-        <div className="flex items-center justify-between pb-4 border-b border-neutral-200 shrink-0">
+        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-neutral-200 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-xs">
-              <Scale className="w-5 h-5" />
+            <div className="w-8 sm:w-9 h-8 sm:h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-xs shrink-0">
+              <Scale className="w-4 sm:w-5 h-4 sm:h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-neutral-900 font-serif">
-                So sánh Trực quan Phương án Phối đồ ⚖️
-              </h2>
-              <span className="text-[11px] text-neutral-500 font-medium">
-                Đặt 2 set đồ cạnh nhau để dễ dàng đánh giá thẩm mỹ và ra quyết định tối ưu
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm sm:text-base md:text-lg font-bold text-neutral-900 font-serif">
+                  So sánh Trực quan Phương án Phối đồ
+                </h2>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                  <Sparkles className="w-2.5 h-2.5 text-amber-600" /> AI Phân tích
+                </span>
+              </div>
+              <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium">
+                Đặt 2 set đồ cạnh nhau & lắng nghe phân tích chuyên sâu từ AI Stylist
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               type="button"
               onClick={onClearDrafts}
-              className="text-xs text-neutral-500 hover:text-rose-700 px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition cursor-pointer flex items-center gap-1"
+              className="text-xs text-neutral-500 hover:text-rose-700 px-2 sm:px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition cursor-pointer flex items-center gap-1"
               title="Xóa danh sách bản nháp"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -1920,152 +2085,284 @@ export function ComparisonModal({
           </div>
         </div>
 
-        {/* 2 Nửa So Sánh: Split-screen Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 py-4 overflow-y-auto flex-1">
-          {/* PHƯƠNG ÁN A */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200 flex flex-col items-center justify-between space-y-4 relative group hover:border-amber-400 transition-all">
-            <div className="w-full flex items-center justify-between pb-2 border-b border-neutral-200">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-neutral-900 text-white">
-                Phương án A
-              </span>
-              <span className="text-[11px] text-neutral-500">
-                {draftA.createdAt ? `Lưu lúc ${draftA.createdAt}` : 'Bản nháp 1'}
-              </span>
-            </div>
-
-            {/* Avatar A */}
-            <div className="w-full flex justify-center py-1">
-              <AvatarComposite
-                topId={draftA.top}
-                bottomId={draftA.bottom}
-                shoeId={draftA.shoes}
-                accessoryIds={draftA.accessories}
-                topColorHex={draftA.topColor.hex}
-                bottomColorHex={draftA.bottomColor.hex}
-                gender={draftA.gender}
-                className="w-full max-w-[190px] aspect-[1/2]"
-              />
-            </div>
-
-            {/* Chi tiết trang phục A */}
-            <div className="w-full space-y-2 text-xs">
-              <div className="font-bold text-sm text-neutral-900 truncate text-center">
-                {itemTopA?.name || draftA.top} × {itemBottomA?.name || draftA.bottom}
+        {/* Modal Body: Cuộn mượt mà trên mobile & desktop */}
+        <div className="overflow-y-auto flex-1 py-3 sm:py-4 space-y-4 sm:space-y-6 pr-1">
+          {/* 2 Nửa So Sánh: Split-screen Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {/* PHƯƠNG ÁN A */}
+            <div className="p-3.5 sm:p-5 rounded-2xl bg-neutral-50/90 border border-neutral-200 flex flex-col items-center justify-between space-y-3.5 relative group hover:border-amber-400 transition-all shadow-2xs">
+              <div className="w-full flex items-center justify-between pb-2 border-b border-neutral-200">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-neutral-900 text-white flex items-center gap-1">
+                  <span>Phương án A</span>
+                </span>
+                <span className="text-[11px] text-neutral-500">
+                  {draftA.createdAt ? `Lưu lúc ${draftA.createdAt}` : 'Bản nháp 1'}
+                </span>
               </div>
 
-              <div className="bg-white p-2.5 rounded-xl border border-neutral-200/80 space-y-1.5">
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-500">Phối màu:</span>
-                  <div className="flex items-center gap-1 font-semibold text-neutral-800">
-                    <span className="w-2.5 h-2.5 rounded-full border border-black/10" style={{ backgroundColor: draftA.topColor.hex }} />
-                    <span>{draftA.topColor.name}</span>
-                    <span>+</span>
-                    <span className="w-2.5 h-2.5 rounded-full border border-black/10" style={{ backgroundColor: draftA.bottomColor.hex }} />
-                    <span>{draftA.bottomColor.name}</span>
+              {/* Avatar A */}
+              <div className="w-full flex justify-center py-1">
+                <AvatarComposite
+                  topId={draftA.top}
+                  bottomId={draftA.bottom}
+                  shoeId={draftA.shoes}
+                  accessoryIds={draftA.accessories}
+                  topColorHex={draftA.topColor.hex}
+                  bottomColorHex={draftA.bottomColor.hex}
+                  gender={draftA.gender}
+                  className="w-full max-w-[170px] sm:max-w-[190px] aspect-[1/2]"
+                />
+              </div>
+
+              {/* Chi tiết trang phục A */}
+              <div className="w-full space-y-2 text-xs">
+                <div className="font-bold text-sm text-neutral-900 truncate text-center">
+                  {itemTopA?.name || draftA.top} × {itemBottomA?.name || draftA.bottom}
+                </div>
+
+                <div className="bg-white p-2.5 rounded-xl border border-neutral-200/80 space-y-1.5 shadow-2xs">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Phối màu:</span>
+                    <div className="flex items-center gap-1 font-semibold text-neutral-800">
+                      <span className="w-2.5 h-2.5 rounded-full border border-black/10" style={{ backgroundColor: draftA.topColor.hex }} />
+                      <span>{draftA.topColor.name}</span>
+                      <span>+</span>
+                      <span className="w-2.5 h-2.5 rounded-full border border-black/10" style={{ backgroundColor: draftA.bottomColor.hex }} />
+                      <span>{draftA.bottomColor.name}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Thẩm mỹ:</span>
+                    <span className={`px-2 py-0.2 rounded-full font-bold ${harmonyA.badgeClass}`}>
+                      {harmonyA.badge}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Giày / Dép:</span>
+                    <span className="font-medium text-neutral-800 truncate max-w-[160px]">{itemShoeA?.name || 'Tự do'}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Phụ kiện:</span>
+                    <span className="font-medium text-neutral-800">{draftA.accessories.length} món</span>
                   </div>
                 </div>
-
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-500">Thẩm mỹ:</span>
-                  <span className={`px-2 py-0.2 rounded-full font-bold ${harmonyA.badgeClass}`}>
-                    {harmonyA.badge}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-500">Giày / Dép:</span>
-                  <span className="font-medium text-neutral-800 truncate max-w-[160px]">{itemShoeA?.name || 'Tự do'}</span>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-500">Phụ kiện:</span>
-                  <span className="font-medium text-neutral-800">{draftA.accessories.length} món</span>
-                </div>
               </div>
+
+              {/* Nút Chọn Set A */}
+              <button
+                type="button"
+                onClick={() => onSelectOutfit(draftA)}
+                className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-neutral-900 hover:bg-neutral-800 text-white shadow-xs hover:shadow transition cursor-pointer active:scale-98 flex items-center justify-center gap-1.5"
+              >
+                <Check className="w-4 h-4 text-emerald-400" />
+                <span>Chọn set này (Phương án A)</span>
+              </button>
             </div>
 
-            {/* Nút Chọn Set A */}
-            <button
-              type="button"
-              onClick={() => onSelectOutfit(draftA)}
-              className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-neutral-900 hover:bg-neutral-800 text-white shadow-xs hover:shadow transition cursor-pointer active:scale-98 flex items-center justify-center gap-1.5"
-            >
-              <Check className="w-4 h-4 text-emerald-400" />
-              <span>Chọn set này (Phương án A)</span>
-            </button>
+            {/* PHƯƠNG ÁN B */}
+            <div className="p-3.5 sm:p-5 rounded-2xl bg-neutral-50/90 border border-neutral-200 flex flex-col items-center justify-between space-y-3.5 relative group hover:border-amber-400 transition-all shadow-2xs">
+              <div className="w-full flex items-center justify-between pb-2 border-b border-neutral-200">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-rose-700 text-white flex items-center gap-1">
+                  <span>Phương án B</span>
+                </span>
+                <span className="text-[11px] text-neutral-500">
+                  {draftB.createdAt ? `Lưu lúc ${draftB.createdAt}` : 'Bản nháp 2 / Đang mặc'}
+                </span>
+              </div>
+
+              {/* Avatar B */}
+              <div className="w-full flex justify-center py-1">
+                <AvatarComposite
+                  topId={draftB.top}
+                  bottomId={draftB.bottom}
+                  shoeId={draftB.shoes}
+                  accessoryIds={draftB.accessories}
+                  topColorHex={draftB.topColor.hex}
+                  bottomColorHex={draftB.bottomColor.hex}
+                  gender={draftB.gender}
+                  className="w-full max-w-[170px] sm:max-w-[190px] aspect-[1/2]"
+                />
+              </div>
+
+              {/* Chi tiết trang phục B */}
+              <div className="w-full space-y-2 text-xs">
+                <div className="font-bold text-sm text-neutral-900 truncate text-center">
+                  {itemTopB?.name || draftB.top} × {itemBottomB?.name || draftB.bottom}
+                </div>
+
+                <div className="bg-white p-2.5 rounded-xl border border-neutral-200/80 space-y-1.5 shadow-2xs">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Phối màu:</span>
+                    <div className="flex items-center gap-1 font-semibold text-neutral-800">
+                      <span className="w-2.5 h-2.5 rounded-full border border-black/10" style={{ backgroundColor: draftB.topColor.hex }} />
+                      <span>{draftB.topColor.name}</span>
+                      <span>+</span>
+                      <span className="w-2.5 h-2.5 rounded-full border border-black/10" style={{ backgroundColor: draftB.bottomColor.hex }} />
+                      <span>{draftB.bottomColor.name}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Thẩm mỹ:</span>
+                    <span className={`px-2 py-0.2 rounded-full font-bold ${harmonyB.badgeClass}`}>
+                      {harmonyB.badge}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Giày / Dép:</span>
+                    <span className="font-medium text-neutral-800 truncate max-w-[160px]">{itemShoeB?.name || 'Tự do'}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Phụ kiện:</span>
+                    <span className="font-medium text-neutral-800">{draftB.accessories.length} món</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nút Chọn Set B */}
+              <button
+                type="button"
+                onClick={() => onSelectOutfit(draftB)}
+                className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-rose-700 hover:bg-rose-800 text-white shadow-xs hover:shadow transition cursor-pointer active:scale-98 flex items-center justify-center gap-1.5"
+              >
+                <Check className="w-4 h-4 text-amber-300" />
+                <span>Chọn set này (Phương án B)</span>
+              </button>
+            </div>
           </div>
 
-          {/* PHƯƠNG ÁN B */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200 flex flex-col items-center justify-between space-y-4 relative group hover:border-amber-400 transition-all">
-            <div className="w-full flex items-center justify-between pb-2 border-b border-neutral-200">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-rose-700 text-white">
-                Phương án B
-              </span>
-              <span className="text-[11px] text-neutral-500">
-                {draftB.createdAt ? `Lưu lúc ${draftB.createdAt}` : 'Bản nháp 2 / Đang mặc'}
-              </span>
-            </div>
-
-            {/* Avatar B */}
-            <div className="w-full flex justify-center py-1">
-              <AvatarComposite
-                topId={draftB.top}
-                bottomId={draftB.bottom}
-                shoeId={draftB.shoes}
-                accessoryIds={draftB.accessories}
-                topColorHex={draftB.topColor.hex}
-                bottomColorHex={draftB.bottomColor.hex}
-                gender={draftB.gender}
-                className="w-full max-w-[190px] aspect-[1/2]"
-              />
-            </div>
-
-            {/* Chi tiết trang phục B */}
-            <div className="w-full space-y-2 text-xs">
-              <div className="font-bold text-sm text-neutral-900 truncate text-center">
-                {itemTopB?.name || draftB.top} × {itemBottomB?.name || draftB.bottom}
+          {/* KHỐI AI PHÂN TÍCH & ĐƯA RA NHẬN XÉT CỦA 2 BẢN PHỐI (DÙNG GEMINI AI) */}
+          <div className="rounded-2xl border border-amber-300/80 bg-gradient-to-br from-amber-50/80 via-rose-50/40 to-orange-50/60 p-4 sm:p-5 shadow-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-amber-200/70 mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500 to-rose-600 text-white flex items-center justify-center shadow-xs">
+                  <Sparkles className="w-4 h-4 text-amber-200" />
+                </div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-bold text-neutral-900 font-serif flex items-center gap-1.5">
+                    <span>AI Stylist Phân Tích & So Sánh 2 Bản Phối</span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-md bg-amber-200/80 text-amber-900 font-bold">Gemini AI</span>
+                  </h3>
+                  <p className="text-[11px] text-neutral-600">
+                    Đối chiếu chuẩn mực văn hóa di sản & phong cách thời trang đương đại
+                  </p>
+                </div>
               </div>
 
-              <div className="bg-white p-2.5 rounded-xl border border-neutral-200/80 space-y-1.5">
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-500">Phối màu:</span>
-                  <div className="flex items-center gap-1 font-semibold text-neutral-800">
-                    <span className="w-2.5 h-2.5 rounded-full border border-black/10" style={{ backgroundColor: draftB.topColor.hex }} />
-                    <span>{draftB.topColor.name}</span>
-                    <span>+</span>
-                    <span className="w-2.5 h-2.5 rounded-full border border-black/10" style={{ backgroundColor: draftB.bottomColor.hex }} />
-                    <span>{draftB.bottomColor.name}</span>
+              <button
+                type="button"
+                onClick={() => fetchComparisonAnalysis(true)}
+                disabled={isLoadingAi}
+                className="px-2.5 py-1 text-[11px] font-bold text-amber-900 bg-white/90 hover:bg-white border border-amber-300 rounded-xl transition flex items-center gap-1 cursor-pointer disabled:opacity-50 shadow-2xs"
+                title="Yêu cầu AI phân tích lại"
+              >
+                <RotateCcw className={`w-3 h-3 ${isLoadingAi ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">Phân tích lại</span>
+              </button>
+            </div>
+
+            {isLoadingAi ? (
+              <div className="py-6 flex flex-col items-center justify-center text-center space-y-2">
+                <Loader2 className="w-6 h-6 animate-spin text-amber-600" />
+                <p className="text-xs font-semibold text-neutral-700">
+                  Gemini AI đang phân tích phom dáng, phối màu và tính ứng dụng của 2 bản phối...
+                </p>
+                <span className="text-[11px] text-neutral-500">
+                  Đối chiếu điển chế triều đại và phong cách Gen Z đương đại
+                </span>
+              </div>
+            ) : aiAnalysis ? (
+              <div className="space-y-3.5 text-xs">
+                {/* Tóm lược tổng quan */}
+                {aiAnalysis.overview && (
+                  <div className="bg-white/90 p-3 rounded-xl border border-amber-200/70 text-neutral-800 leading-relaxed italic shadow-2xs">
+                    <span className="font-bold text-amber-900 not-italic mr-1.5">💡 Tổng quan so sánh:</span>
+                    {aiAnalysis.overview}
+                  </div>
+                )}
+
+                {/* Phân tích 2 bên: Set A vs Set B */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Card A */}
+                  <div className="bg-white/90 p-3 rounded-xl border border-neutral-200/80 space-y-2 shadow-2xs">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-neutral-100">
+                      <span className="font-bold text-neutral-900 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-neutral-900" />
+                        Phương án A
+                      </span>
+                      {aiAnalysis.outfitA?.vibe && (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-neutral-100 text-neutral-700 border border-neutral-200">
+                          {aiAnalysis.outfitA.vibe}
+                        </span>
+                      )}
+                    </div>
+                    {aiAnalysis.outfitA?.strengths && (
+                      <ul className="space-y-1 text-[11px] text-neutral-700">
+                        {aiAnalysis.outfitA.strengths.map((str, i) => (
+                          <li key={i} className="flex items-start gap-1.5">
+                            <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                            <span>{str}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {aiAnalysis.outfitA?.bestOccasion && (
+                      <div className="pt-1.5 border-t border-neutral-100 text-[11px]">
+                        <span className="text-neutral-500">Dịp lý tưởng: </span>
+                        <span className="font-semibold text-neutral-800">{aiAnalysis.outfitA.bestOccasion}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card B */}
+                  <div className="bg-white/90 p-3 rounded-xl border border-neutral-200/80 space-y-2 shadow-2xs">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-neutral-100">
+                      <span className="font-bold text-rose-900 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-rose-700" />
+                        Phương án B
+                      </span>
+                      {aiAnalysis.outfitB?.vibe && (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-200">
+                          {aiAnalysis.outfitB.vibe}
+                        </span>
+                      )}
+                    </div>
+                    {aiAnalysis.outfitB?.strengths && (
+                      <ul className="space-y-1 text-[11px] text-neutral-700">
+                        {aiAnalysis.outfitB.strengths.map((str, i) => (
+                          <li key={i} className="flex items-start gap-1.5">
+                            <span className="text-rose-600 font-bold shrink-0">✓</span>
+                            <span>{str}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {aiAnalysis.outfitB?.bestOccasion && (
+                      <div className="pt-1.5 border-t border-neutral-100 text-[11px]">
+                        <span className="text-neutral-500">Dịp lý tưởng: </span>
+                        <span className="font-semibold text-neutral-800">{aiAnalysis.outfitB.bestOccasion}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-500">Thẩm mỹ:</span>
-                  <span className={`px-2 py-0.2 rounded-full font-bold ${harmonyB.badgeClass}`}>
-                    {harmonyB.badge}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-500">Giày / Dép:</span>
-                  <span className="font-medium text-neutral-800 truncate max-w-[160px]">{itemShoeB?.name || 'Tự do'}</span>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-500">Phụ kiện:</span>
-                  <span className="font-medium text-neutral-800">{draftB.accessories.length} món</span>
-                </div>
+                {/* Stylist Verdict */}
+                {aiAnalysis.verdict && (
+                  <div className="bg-gradient-to-r from-amber-100/90 to-rose-100/90 p-3 rounded-xl border border-amber-300 text-neutral-900 flex items-start gap-2 shadow-2xs">
+                    <Crown className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                    <div className="text-[11px] leading-relaxed">
+                      <span className="font-bold text-amber-950 block mb-0.5">Lời khuyên chốt hạ của Stylist AI:</span>
+                      <span>{aiAnalysis.verdict}</span>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-
-            {/* Nút Chọn Set B */}
-            <button
-              type="button"
-              onClick={() => onSelectOutfit(draftB)}
-              className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-rose-700 hover:bg-rose-800 text-white shadow-xs hover:shadow transition cursor-pointer active:scale-98 flex items-center justify-center gap-1.5"
-            >
-              <Check className="w-4 h-4 text-amber-300" />
-              <span>Chọn set này (Phương án B)</span>
-            </button>
+            ) : null}
           </div>
         </div>
       </div>
@@ -2234,6 +2531,8 @@ interface LookbookViewProps {
   onDeleteOutfit: (id: string) => void;
   onShareOutfit: (item: LookbookItem) => void;
   onGoToMixMatch: () => void;
+  onOpenVendor?: (item: LookbookItem) => void;
+  onUpdateName?: (id: string, newName: string) => void;
 }
 
 export function LookbookView({
@@ -2241,61 +2540,94 @@ export function LookbookView({
   onEquipOutfit,
   onDeleteOutfit,
   onShareOutfit,
-  onGoToMixMatch
+  onGoToMixMatch,
+  onOpenVendor,
+  onUpdateName
 }: LookbookViewProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
+
+  // Lọc theo tên bản phối
+  const filteredLookbooks = useMemo(() => {
+    if (!searchQuery.trim()) return lookbooks;
+    const q = searchQuery.toLowerCase().trim();
+    return lookbooks.filter(b => b.name.toLowerCase().includes(q));
+  }, [lookbooks, searchQuery]);
+
+  const handleStartEdit = (item: LookbookItem) => {
+    setEditingId(item.id);
+    setEditingName(item.name);
+  };
+
+  const handleSaveEdit = (id: string) => {
+    if (editingName.trim() && onUpdateName) {
+      onUpdateName(id, editingName.trim());
+    }
+    setEditingId(null);
+  };
+
   return (
     <div className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-rose-900 via-amber-800 to-rose-950 rounded-3xl p-6 lg:p-8 text-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[11px] font-bold text-amber-200 border border-white/15 mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Lookbook Cá Nhân Việt Vibe</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold font-serif">
-            Lookbook Việt Phục Của Tôi 📸
-          </h2>
-          <p className="text-xs sm:text-sm text-amber-100/80 mt-1 max-w-xl">
-            Không gian lưu trữ những bản phối cổ phong kết hợp đương đại do chính bạn sáng tạo. Hãy chia sẻ thiệp Lookbook độc bản để lan tỏa nét đẹp di sản!
-          </p>
+      {/* Thanh điều khiển tối giản: Tìm kiếm, Số bản phối và Nút Phối đồ mới */}
+      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-amber-900/10 p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Thanh tìm kiếm theo tên bản phối */}
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm theo tên bản phối..."
+            className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl bg-[#FAF6EE] border border-amber-900/15 focus:bg-white focus:border-rose-600 focus:ring-1 focus:ring-rose-500/20 outline-none transition text-neutral-800 placeholder-neutral-400"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-700"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-center">
-            <span className="block text-2xl font-black text-amber-300 leading-none">
-              {lookbooks.length}
-            </span>
-            <span className="text-[10px] text-amber-100 uppercase tracking-wider font-semibold">
-              Bản phối đã lưu
-            </span>
+        {/* Nút số bản phối và nút phối đồ mới */}
+        <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-auto">
+          <div className="px-3 py-1.5 rounded-xl bg-amber-100/90 border border-amber-300/80 text-amber-950 font-bold text-xs flex items-center gap-1.5 shadow-2xs">
+            <Bookmark className="w-3.5 h-3.5 text-amber-700" />
+            <span>{filteredLookbooks.length} / {lookbooks.length} bản phối</span>
           </div>
 
           <button
             type="button"
             onClick={onGoToMixMatch}
-            className="px-4 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-xs sm:text-sm transition shadow-xs cursor-pointer active:scale-95 flex items-center gap-1.5"
+            className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-xs shadow-xs cursor-pointer active:scale-95 transition-all hover:-translate-y-0.5 flex items-center gap-1.5"
           >
+            <Shirt className="w-3.5 h-3.5" />
             <span>+ Phối đồ mới</span>
           </button>
         </div>
       </div>
 
       {/* Grid Danh sách Lookbook */}
-      {lookbooks.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-neutral-200 p-12 text-center space-y-3">
-          <div className="w-16 h-16 rounded-3xl bg-rose-50 text-rose-700 flex items-center justify-center mx-auto text-2xl">
-            📸
+      {filteredLookbooks.length === 0 ? (
+        <div className="bg-white/80 backdrop-blur-md rounded-3xl border border-amber-900/10 p-12 text-center space-y-3">
+          <div className="w-16 h-16 rounded-3xl bg-amber-50 text-amber-700 flex items-center justify-center mx-auto text-2xl shadow-inner">
+            📷
           </div>
           <h3 className="text-lg font-bold text-neutral-800 font-serif">
-            Lookbook của bạn đang trống
+            {searchQuery ? 'Không tìm thấy bản phối phù hợp' : 'Lookbook của bạn đang trống'}
           </h3>
           <p className="text-xs text-neutral-500 max-w-md mx-auto">
-            Hãy chuyển sang tab "Phối đồ", chọn những món Việt phục và hạ phục bạn yêu thích, sau đó nhấn nút "Lưu vào Lookbook" nhé!
+            {searchQuery 
+              ? `Không có bản phối nào khớp với từ khóa "${searchQuery}".` 
+              : 'Hãy chuyển sang tab "Phối đồ", chọn những món Việt phục và hạ phục bạn yêu thích, sau đó nhấn nút "Lưu vào Lookbook" nhé!'}
           </p>
           <button
             type="button"
             onClick={onGoToMixMatch}
-            className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer active:scale-95"
+            className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95 shadow-sm"
           >
             <Shirt className="w-4 h-4" />
             <span>Bắt đầu phối đồ ngay</span>
@@ -2303,32 +2635,72 @@ export function LookbookView({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {lookbooks.map((item) => {
+          {filteredLookbooks.map((item) => {
             const topItem = culturalDatabase[item.top];
             const bottomItem = culturalDatabase[item.bottom];
             const shoeItem = culturalDatabase[item.shoes];
             const harmony = evaluateColorHarmony(item.topColor, item.bottomColor);
+            const isEditingThis = editingId === item.id;
 
             return (
               <div
                 key={item.id}
-                className="bg-white rounded-3xl border border-neutral-200 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+                className="bg-white/90 backdrop-blur-md rounded-3xl border border-amber-900/10 p-5 shadow-xs hover:shadow-md hover:border-amber-500/30 transition-all flex flex-col justify-between space-y-4 group"
               >
-                {/* Header card */}
+                {/* Header card: Cho phép sửa tên bản phối */}
                 <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-neutral-100">
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">
-                      {item.createdAt || 'Lookbook'}
-                    </span>
-                    <h3 className="text-base font-bold text-neutral-900 font-serif truncate" title={item.name}>
-                      {item.name}
-                    </h3>
+                    {isEditingThis ? (
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="text"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSaveEdit(item.id);
+                            if (e.key === 'Escape') setEditingId(null);
+                          }}
+                          className="w-full px-2.5 py-1 text-xs sm:text-sm font-bold border border-rose-400 rounded-lg outline-none bg-rose-50/50 text-neutral-900"
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleSaveEdit(item.id)}
+                          className="p-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
+                          title="Lưu tên mới"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingId(null)}
+                          className="p-1 rounded-lg bg-neutral-200 text-neutral-700 hover:bg-neutral-300 transition"
+                          title="Hủy"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 group/title">
+                        <h3 className="text-base font-bold text-neutral-900 font-serif truncate" title={item.name}>
+                          {item.name}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => handleStartEdit(item)}
+                          className="p-1 rounded text-neutral-300 hover:text-amber-700 hover:bg-amber-50 transition cursor-pointer shrink-0"
+                          title="Sửa tên bản phối này"
+                        >
+                          <Edit2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <button
                     type="button"
                     onClick={() => onDeleteOutfit(item.id)}
-                    className="p-1.5 rounded-lg text-neutral-300 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                    className="p-1.5 rounded-lg text-neutral-300 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer shrink-0"
                     title="Xóa set đồ này khỏi Lookbook"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -2351,7 +2723,7 @@ export function LookbookView({
 
                 {/* Chi tiết trang phục & Phối màu */}
                 <div className="space-y-2 text-xs">
-                  <div className="bg-neutral-50 p-2.5 rounded-xl border border-neutral-200/70 space-y-1.5">
+                  <div className="bg-[#FAF6EE] p-2.5 rounded-xl border border-amber-900/10 space-y-1.5">
                     <div className="flex items-center justify-between text-[11px]">
                       <span className="text-neutral-500 font-medium">Áo:</span>
                       <div className="flex items-center gap-1 font-semibold text-neutral-800 truncate max-w-[170px]">
@@ -2384,27 +2756,41 @@ export function LookbookView({
                   </div>
                 </div>
 
-                {/* Footer Buttons: Mặc lại set này & Nút Share */}
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-neutral-100">
-                  <button
-                    type="button"
-                    onClick={() => onEquipOutfit(item)}
-                    className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer active:scale-95"
-                    title="Mặc set đồ này vào Avatar chính"
-                  >
-                    <Shirt className="w-3.5 h-3.5" />
-                    <span>Mặc lại set này</span>
-                  </button>
+                {/* Footer Buttons: Mặc lại set này & Nút Share & Nơi thuê/may */}
+                <div className="space-y-2 pt-1 border-t border-neutral-100">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onEquipOutfit(item)}
+                      className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95 shadow-2xs"
+                      title="Mặc set đồ này vào Avatar chính"
+                    >
+                      <Shirt className="w-3.5 h-3.5" />
+                      <span>Mặc lại set này</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => onShareOutfit(item)}
-                    className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-xs font-bold transition cursor-pointer active:scale-95"
-                    title="Chia sẻ thiệp Lookbook"
-                  >
-                    <Share2 className="w-3.5 h-3.5" />
-                    <span>Chia sẻ 📸</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => onShareOutfit(item)}
+                      className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-xs font-bold transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95"
+                      title="Chia sẻ thiệp Lookbook"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      <span>Chia sẻ</span>
+                    </button>
+                  </div>
+
+                  {onOpenVendor && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenVendor(item)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95"
+                      title="Tìm nơi thuê hoặc may đo set đồ này"
+                    >
+                      <Store className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Thuê / May set này ở đâu?</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -2445,17 +2831,1602 @@ export const INITIAL_LOOKBOOK: LookbookItem[] = [
   }
 ];
 
-interface MixMatchScreenProps {
-  initialOutfit: OutfitRecommendation;
-  onBack: () => void;
+// ==========================================
+// MOCK DATABASE CỬA HÀNG (VENDOR DATABASE)
+// ==========================================
+export interface VendorStore {
+  id: string;
+  name: string;
+  isOpen: boolean;
+  address: string;
+  rating: number;
+  distance: number;
+  priceRange: string;
+  specialty: string[];
+  phone: string;
 }
 
-export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
-  // Điều hướng giữa 3 màn hình: 'mix_match' (Phối đồ), 'epic_library' (Thư viện sử thi) và 'lookbook' (Lookbook của tôi)
-  const [viewMode, setViewMode] = useState<'mix_match' | 'epic_library' | 'lookbook'>('mix_match');
-  const [librarySelectedId, setLibrarySelectedId] = useState<string>('ao_nhat_binh');
+export const vendorDatabase: VendorStore[] = [
+  {
+    id: 'store-1',
+    name: 'Ỷ Vân Hiên',
+    isOpen: true,
+    address: '122 Ngõ Giếng, Phố Hoàng Cầu, Đống Đa, Hà Nội',
+    rating: 4.9,
+    distance: 1.2,
+    priceRange: 'Từ 1.500.000đ (May đo) • 450k/ngày (Thuê)',
+    specialty: ['May đo cao cấp', 'Triều Nguyễn', 'Phục dựng di sản', 'Tơ tằm Vạn Phúc'],
+    phone: '0988 123 456'
+  },
+  {
+    id: 'store-2',
+    name: 'Cổ Phục Hoa Niên',
+    isOpen: true,
+    address: 'Tầng 2, 28A Lê Thánh Tôn, Bến Nghé, Quận 1, TP.HCM',
+    rating: 4.8,
+    distance: 3.5,
+    priceRange: '200k - 500k/ngày • Bán sẵn từ 850.000đ',
+    specialty: ['Cách tân Gen Z', 'Dạo phố & Cafe', 'Áo ngũ thân', 'Bán sẵn'],
+    phone: '0903 888 999'
+  },
+  {
+    id: 'store-3',
+    name: 'Đông Phong Cổ Phục',
+    isOpen: true,
+    address: '16 Ngõ 20 Huỳnh Thúc Kháng, Láng Hạ, Đống Đa, Hà Nội',
+    rating: 4.7,
+    distance: 2.8,
+    priceRange: '180k - 350k/ngày',
+    specialty: ['Cho thuê sinh viên', 'Chụp ảnh concept', 'Kỷ yếu trường học', 'Áo Tấc'],
+    phone: '0912 345 678'
+  },
+  {
+    id: 'store-4',
+    name: 'Đại Nam Chân Ảnh',
+    isOpen: false,
+    address: '45 Phố Quán Thánh, Ba Đình, Hà Nội',
+    rating: 5.0,
+    distance: 5.2,
+    priceRange: '350k - 800k/ngày',
+    specialty: ['Trang sức kim hoàn', 'Trâm cài bạc', 'Lễ phục cưới', 'Quạt giấy Chàng Sơn'],
+    phone: '0977 654 321'
+  },
+  {
+    id: 'store-5',
+    name: 'Vạn Thiên Y',
+    isOpen: true,
+    address: '88 Phố Hàng Bông, Hoàn Kiếm, Hà Nội',
+    rating: 4.6,
+    distance: 4.1,
+    priceRange: '250k - 600k/ngày',
+    specialty: ['Áo Nhật Bình', 'Áo Giao Lĩnh', 'Cho thuê phụ kiện', 'Tư vấn lễ nghi'],
+    phone: '0934 567 890'
+  }
+];
 
-  // Trạng thái lựa chọn món đồ - Khởi tạo từ initialOutfit do AI gợi ý
+// ==========================================
+// COMPONENT MÀN HÌNH TAB MỚI: TIỆM CỔ PHỤC (STORE LOCATOR SCREEN)
+// ==========================================
+interface StoreLocatorScreenProps {
+  onCallStore: (store: VendorStore) => void;
+  onGoToMixMatch: () => void;
+}
+
+export function StoreLocatorScreen({ onCallStore, onGoToMixMatch }: StoreLocatorScreenProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'distance' | 'rating' | 'default'>('distance');
+  const [filterOnlyOpen, setFilterOnlyOpen] = useState(false);
+
+  // Xử lý logic tìm kiếm và lọc thời gian thực (real-time filtering)
+  const filteredStores = useMemo(() => {
+    let list = vendorDatabase.filter(store => {
+      const q = searchQuery.toLowerCase().trim();
+      const matchNameOrAddr = 
+        !q ||
+        store.name.toLowerCase().includes(q) ||
+        store.address.toLowerCase().includes(q) ||
+        store.specialty.some(s => s.toLowerCase().includes(q));
+      const matchOpen = filterOnlyOpen ? store.isOpen : true;
+      return matchNameOrAddr && matchOpen;
+    });
+
+    if (sortBy === 'distance') {
+      list = [...list].sort((a, b) => a.distance - b.distance);
+    } else if (sortBy === 'rating') {
+      list = [...list].sort((a, b) => b.rating - a.rating);
+    }
+
+    return list;
+  }, [searchQuery, sortBy, filterOnlyOpen]);
+
+  return (
+    <div className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
+      {/* PHẦN A: BỘ CÔNG CỤ TÌM KIẾM & LỌC (Search & Filter Bar) */}
+      <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-amber-900/10 p-4 sm:p-5 shadow-xs space-y-4">
+        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+          {/* Thanh tìm kiếm: Tìm theo tên tiệm hoặc địa chỉ */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Tìm kiếm theo tên tiệm, địa chỉ hoặc thế mạnh..."
+              className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-[#FAF6EE] border border-amber-900/15 text-xs sm:text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-0.5"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Nút Sàn phối đồ */}
+          <button
+            type="button"
+            onClick={onGoToMixMatch}
+            className="px-4 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-xs sm:text-sm transition shadow-xs cursor-pointer active:scale-95 flex items-center justify-center gap-1.5 shrink-0 self-end md:self-auto hover:-translate-y-0.5"
+          >
+            <Shirt className="w-4 h-4" />
+            <span>Sàn phối đồ</span>
+          </button>
+        </div>
+
+        {/* Các nút Lọc (Filter Chips) */}
+        <div className="flex items-center gap-2 flex-wrap pt-1">
+            {/* Lọc theo khoảng cách: Gần nhất -> Xa nhất */}
+            <button
+              type="button"
+              onClick={() => setSortBy(sortBy === 'distance' ? 'default' : 'distance')}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                sortBy === 'distance'
+                  ? 'bg-emerald-700 text-white shadow-2xs'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              }`}
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              <span>Gần nhất</span>
+            </button>
+
+            {/* Lọc theo đánh giá: Cao -> Thấp */}
+            <button
+              type="button"
+              onClick={() => setSortBy(sortBy === 'rating' ? 'default' : 'rating')}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                sortBy === 'rating'
+                  ? 'bg-amber-500 text-neutral-950 font-extrabold shadow-2xs'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              }`}
+            >
+              <span>⭐ Đánh giá cao</span>
+            </button>
+
+            {/* Lọc theo trạng thái: Chỉ hiện tiệm đang Mở cửa */}
+            <button
+              type="button"
+              onClick={() => setFilterOnlyOpen(!filterOnlyOpen)}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                filterOnlyOpen
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${filterOnlyOpen ? 'bg-white' : 'bg-emerald-500'}`} />
+              <span>Chỉ tiệm đang Mở cửa</span>
+            </button>
+          </div>
+
+        <div className="flex items-center justify-between text-xs text-neutral-500 pt-1 border-t border-neutral-100">
+          <span>Tìm thấy <strong>{filteredStores.length}</strong> / {vendorDatabase.length} tiệm cổ phục</span>
+          {(searchQuery || filterOnlyOpen || sortBy !== 'distance') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setSortBy('distance');
+                setFilterOnlyOpen(false);
+              }}
+              className="text-emerald-700 hover:underline font-semibold cursor-pointer"
+            >
+              Đặt lại bộ lọc
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* PHẦN B: DANH SÁCH CỬA HÀNG (Vendor Cards) */}
+      {filteredStores.length === 0 ? (
+        <div className="bg-white rounded-3xl border border-neutral-200 p-12 text-center space-y-3">
+          <div className="w-16 h-16 rounded-3xl bg-neutral-100 text-neutral-400 flex items-center justify-center mx-auto text-2xl">
+            🏪
+          </div>
+          <h3 className="text-lg font-bold text-neutral-800 font-serif">
+            Không tìm thấy tiệm phù hợp
+          </h3>
+          <p className="text-xs sm:text-sm text-neutral-500 max-w-md mx-auto">
+            Hãy thử tìm bằng từ khóa khác hoặc bỏ chọn bộ lọc "Chỉ tiệm đang Mở cửa".
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredStores.map(store => (
+            <div
+              key={store.id}
+              className="bg-white rounded-3xl border border-neutral-200 p-5 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between space-y-4 group"
+            >
+              <div className="space-y-3">
+                {/* Dòng 1: Tên tiệm (font đậm, to) + Badge Trạng thái */}
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-lg font-bold text-neutral-900 font-serif group-hover:text-emerald-900 transition">
+                    {store.name}
+                  </h3>
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-bold text-white shrink-0 shadow-2xs ${
+                      store.isOpen ? 'bg-emerald-600' : 'bg-rose-600'
+                    }`}
+                  >
+                    {store.isOpen ? 'Đang mở cửa' : 'Đóng cửa'}
+                  </span>
+                </div>
+
+                {/* Dòng 2: Khoảng cách + Rating */}
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                    <MapPin className="w-3 h-3 text-emerald-600" />
+                    <span>Cách bạn {store.distance} km</span>
+                  </span>
+                  <span className="flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+                    <span>⭐ {store.rating.toFixed(1)}</span>
+                  </span>
+                </div>
+
+                {/* Dòng 3: Địa chỉ */}
+                <div className="flex items-start gap-1.5 text-xs text-neutral-600">
+                  <MapPin className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+                  <span className="leading-snug">{store.address}</span>
+                </div>
+
+                {/* Dòng 4: Mức giá */}
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-800 bg-neutral-50 p-2.5 rounded-xl border border-neutral-200/60">
+                  <Tag className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>{store.priceRange}</span>
+                </div>
+
+                {/* Dòng 5: Các tag Thế mạnh */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {store.specialty.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="text-[11px] font-medium text-neutral-600 bg-neutral-100 px-2.5 py-0.5 rounded-md"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dòng cuối: Nút Call-to-action (CTA) trải dài toàn thẻ */}
+              <div className="pt-2 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => onCallStore(store)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-neutral-900 to-neutral-800 hover:from-black hover:to-neutral-900 text-white font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs"
+                >
+                  <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                  <span> Liên hệ Đặt lịch ({store.phone})</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==========================================
+// TÍNH NĂNG NÂNG CAO 3: GỢI Ý NHÀ CUNG CẤP (VENDOR RECOMMENDATIONS - O2O)
+// ==========================================
+export interface VendorItem {
+  id: string;
+  name: string;
+  type: string;
+  badge: string;
+  distance: string;
+  address: string;
+  city: string;
+  rating: number;
+  reviewsCount: number;
+  priceRange: string;
+  phone: string;
+  features: string[];
+}
+
+export const MOCK_VENDORS: VendorItem[] = [
+  {
+    id: 'vendor-1',
+    name: 'Ỷ Vân Hiên',
+    type: 'May đo cao cấp & Phục dựng Triều Nguyễn',
+    badge: 'Chuẩn cứ lịch sử 🏛️',
+    distance: '1.2 km',
+    address: '122 Ngõ Giếng, Phố Hoàng Cầu, Đống Đa, Hà Nội',
+    city: 'Hà Nội',
+    rating: 4.9,
+    reviewsCount: 480,
+    priceRange: 'Thuê từ 450.000đ/ngày • May đo từ 3.200.000đ',
+    phone: '0988 123 456',
+    features: ['Vải tơ tằm Vạn Phúc tự nhiên', 'Thợ thêu tay lành nghề', 'Chuyên Áo Tấc, Nhật Bình, Ngũ Thân']
+  },
+  {
+    id: 'vendor-2',
+    name: 'Đông Phong Cổ Phục',
+    type: 'Cho thuê trang phục & Chụp ảnh concept',
+    badge: 'Giá tốt sinh viên 🎓',
+    distance: '2.8 km',
+    address: '16 Ngõ 20 Huỳnh Thúc Kháng, Đống Đa, Hà Nội',
+    city: 'Hà Nội',
+    rating: 4.8,
+    reviewsCount: 320,
+    priceRange: 'Thuê chỉ từ 180.000đ/ngày • Combo phụ kiện +50k',
+    phone: '0912 345 678',
+    features: ['Hơn 500+ bộ Ngũ Thân & Áo Tấc', 'Có sẵn mấn, quạt xếp, guốc mộc', 'Chụp ảnh kỷ yếu & dạo phố']
+  },
+  {
+    id: 'vendor-3',
+    name: 'Cổ Phục Hoa Niên',
+    type: 'Bán sẵn cách tân & Thuê đồ dạo phố Gen Z',
+    badge: 'Gen Z Favorite ⚡',
+    distance: '4.5 km',
+    address: 'Tầng 2, 28A Lê Thánh Tôn, Bến Nghé, Quận 1, TP.HCM',
+    city: 'TP.HCM / Ship toàn quốc',
+    rating: 4.9,
+    reviewsCount: 610,
+    priceRange: 'Bán sẵn từ 850.000đ • Thuê từ 220.000đ/ngày',
+    phone: '0903 888 999',
+    features: ['Form dáng trẻ trung, hiện đại', 'Vải đũi tơ mát mẻ bốn mùa', 'Dễ mix với sneaker & phụ kiện Y2K']
+  },
+  {
+    id: 'vendor-4',
+    name: 'Đại Nam Chân Ảnh',
+    type: 'Studio Cổ phong & Trang sức truyền thống',
+    badge: 'Nghệ nhân kim hoàn 👑',
+    distance: '5.8 km',
+    address: '45 Phố Quán Thánh, Ba Đình, Hà Nội',
+    city: 'Hà Nội',
+    rating: 5.0,
+    reviewsCount: 195,
+    priceRange: 'Thuê phụ kiện từ 50.000đ • Set hoàn chỉnh từ 350.000đ',
+    phone: '0977 654 321',
+    features: ['Trâm bạc mạ vàng tinh xảo', 'Quạt giấy Chàng Sơn dát điệp', 'Guốc mộc truyền thống thủ công']
+  }
+];
+
+interface VendorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  targetOutfit?: OutfitState;
+  onShowToast: (msg: string) => void;
+}
+
+export function VendorRecommendationModal({
+  isOpen,
+  onClose,
+  targetOutfit,
+  onShowToast
+}: VendorModalProps) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 850);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const topName = targetOutfit ? (culturalDatabase[targetOutfit.top]?.name || 'Áo Cổ Phục') : 'Áo Việt Phục';
+  const bottomName = targetOutfit ? (culturalDatabase[targetOutfit.bottom]?.name || 'Hạ phục') : 'Hạ phục';
+
+  return (
+    <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 animate-fadeIn">
+      <div 
+        className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-neutral-200 overflow-hidden animate-scaleUp"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header Modal */}
+        <div className="p-5 sm:p-6 bg-gradient-to-r from-emerald-900 via-teal-900 to-neutral-900 text-white flex items-start justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-[11px] font-bold border border-white/10 mb-2">
+              <Store className="w-3.5 h-3.5" />
+              <span>Mạng Lưới Đối Tác O2O • Đã Kiểm Định Chất Lượng</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold font-serif">
+              Gợi Ý Nơi Thuê & May Đo Cổ Phục 🛍️
+            </h2>
+            <p className="text-xs sm:text-sm text-emerald-100/80 mt-1">
+              Định vị các tiệm phục dựng uy tín, xưởng may tơ tằm và studio cho thuê gần bạn nhất.
+            </p>
+
+            {targetOutfit && (
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/30 backdrop-blur-md border border-white/15 text-xs text-amber-200">
+                <Shirt className="w-3.5 h-3.5" />
+                <span>Đang tìm tiệm cho set: <strong>{topName}</strong> + <strong>{bottomName}</strong></span>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer shrink-0"
+            title="Đóng modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content Body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          {isLoading ? (
+            <div className="py-16 flex flex-col items-center justify-center text-center space-y-4">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full border-4 border-emerald-200 border-t-emerald-600 animate-spin flex items-center justify-center" />
+                <Compass className="w-7 h-7 text-emerald-700 absolute inset-0 m-auto animate-pulse" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-neutral-800">
+                  Đang quét định vị tiệm cổ phục quanh bạn...
+                </h3>
+                <p className="text-xs text-neutral-500 mt-1 max-w-sm">
+                  AI đang đối chiếu danh mục trang phục cần thuê/may đo với mạng lưới 4 xưởng may và đối tác uy tín tại Hà Nội & TP.HCM.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-xs text-neutral-500 px-1">
+                <span>Tìm thấy <strong>4 địa chỉ tiêu biểu</strong> phù hợp với set đồ của bạn</span>
+                <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                  <MapPin className="w-3.5 h-3.5" /> Bán kính gần bạn (~5km)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {MOCK_VENDORS.map(vendor => (
+                  <div
+                    key={vendor.id}
+                    className="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200 hover:border-emerald-300 hover:shadow-md transition-all flex flex-col justify-between space-y-3 group"
+                  >
+                    <div>
+                      {/* Tên tiệm & Badge */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block mb-1">
+                            {vendor.badge}
+                          </span>
+                          <h4 className="text-base font-bold text-neutral-900 group-hover:text-emerald-900 transition">
+                            {vendor.name}
+                          </h4>
+                          <p className="text-xs text-neutral-500 font-medium">{vendor.type}</p>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <div className="flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+                            <span>★</span>
+                            <span>{vendor.rating}</span>
+                          </div>
+                          <span className="text-[10px] text-neutral-400 block mt-0.5">
+                            ({vendor.reviewsCount} đánh giá)
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Địa chỉ & Khoảng cách */}
+                      <div className="mt-3 space-y-1 text-xs text-neutral-600">
+                        <div className="flex items-start gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+                          <span>{vendor.address}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-neutral-500 text-[11px]">
+                          <Navigation className="w-3 h-3 text-emerald-600" />
+                          <span>Cách bạn: <strong>{vendor.distance}</strong></span>
+                          <span>•</span>
+                          <Phone className="w-3 h-3 text-neutral-400" />
+                          <span>Hotline: <strong>{vendor.phone}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* Giá & Đặc điểm */}
+                      <div className="mt-3 p-2.5 rounded-xl bg-white border border-neutral-200/80 space-y-1.5">
+                        <div className="text-[11px] font-bold text-emerald-800 flex items-center gap-1">
+                          <Tag className="w-3 h-3" />
+                          <span>{vendor.priceRange}</span>
+                        </div>
+                        <ul className="text-[11px] text-neutral-600 space-y-0.5 list-disc list-inside">
+                          {vendor.features.map((f, i) => (
+                            <li key={i}>{f}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Nút hành động */}
+                    <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-neutral-200/60">
+                      <button
+                        type="button"
+                        onClick={() => onShowToast(`Đang mở Google Maps dẫn đường đến ${vendor.name} (${vendor.address})... 🗺️`)}
+                        className="py-2 px-2 text-center rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[11px] transition cursor-pointer flex items-center justify-center gap-1 active:scale-95 shadow-2xs"
+                      >
+                        <Navigation className="w-3 h-3" />
+                        <span>Chỉ đường</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onShowToast(`Đang kết nối hotline ${vendor.phone} của ${vendor.name}... 📲`)}
+                        className="py-2 px-2 text-center rounded-xl bg-white hover:bg-neutral-100 text-neutral-800 font-bold text-[11px] border border-neutral-200 transition cursor-pointer flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        <Phone className="w-3 h-3 text-emerald-600" />
+                        <span>Gọi tư vấn</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onShowToast(`Đã áp dụng mã voucher [VIETVIBE10] - Giảm ngay 10% tại ${vendor.name}! 🎟️`)}
+                        className="py-2 px-2 text-center rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-[11px] border border-amber-200 transition cursor-pointer flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        <span>Mã -10% 🎁</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 bg-neutral-100 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>Cam kết quy chuẩn may đúng cổ chế & hỗ trợ chỉnh sửa form theo yêu cầu cá nhân</span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full sm:w-auto px-5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-semibold transition cursor-pointer"
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// TÍNH NĂNG NÂNG CAO 1: DIỄN ĐÀN CỘNG ĐỒNG (SOCIAL HUB / FORUM)
+// ==========================================
+export interface ForumComment {
+  id: string;
+  author: string;
+  avatar: string;
+  text: string;
+  time: string;
+}
+
+export interface ForumPost {
+  id: string;
+  author: {
+    name: string;
+    handle: string;
+    avatar: string;
+    badge: string;
+  };
+  caption: string;
+  tags: string[];
+  timestamp: string;
+  outfit: OutfitState;
+  likes: number;
+  isLiked?: boolean;
+  comments: ForumComment[];
+}
+
+export const INITIAL_FORUM_POSTS: ForumPost[] = [
+  {
+    id: 'post-1',
+    author: {
+      name: 'Linh Chi',
+      handle: '@linhchi.vietvibe',
+      avatar: 'LC',
+      badge: 'Stylist Gen Z ⚡'
+    },
+    caption: 'Nay mình mặc Áo Ngũ Thân tay chẽn vàng lụa phối quần âu đen và sneaker trắng đi cafe Nhà Thờ sáng Chủ Nhật. Vừa gọn gàng dễ vận động vừa toát lên nét thư thái cổ điển! Kính râm Y2K giúp set đồ bớt cứng nhắc hơn nhiều ✨☕💛',
+    tags: ['#NguThan', '#CafePhoCo', '#GenZRemix', '#Streetwear'],
+    timestamp: '2 giờ trước',
+    outfit: {
+      top: 'ao_ngu_than',
+      bottom: 'quan_au',
+      shoes: 'sneaker_low',
+      accessories: ['kinh_ram', 'khan_xep'],
+      topColor: COLOR_PALETTE[1], // Vàng lụa #EEDC82
+      bottomColor: COLOR_PALETTE[3], // Đen #111111
+      gender: 'female'
+    },
+    likes: 184,
+    isLiked: false,
+    comments: [
+      { id: 'c1', author: 'Minh Quân', avatar: 'MQ', text: 'Mix với sneaker trắng nhìn khỏe khoắn mà vẫn giữ nét duyên dáng nha bạn!', time: '1 giờ trước' },
+      { id: 'c2', author: 'Hà My', avatar: 'HM', text: 'Màu vàng lụa này lên ảnh tôn da dã man luôn á ✨ Bấm thử mặc set này luôn!', time: '35 phút trước' }
+    ]
+  },
+  {
+    id: 'post-2',
+    author: {
+      name: 'Hoàng Long',
+      handle: '@long.heritage',
+      avatar: 'HL',
+      badge: 'Nghiên cứu Cổ phục 🏛️'
+    },
+    caption: 'Set Áo Tấc đỏ đô phối quần lụa trắng và hài thêu mình diện đi dự lễ tốt nghiệp và dâng hương tại Văn Miếu. Cảm giác bước đi trong tà áo tấc rộng uy nghi, tự hào khí phách di sản vô cùng! Anh em lưu set này nếu có dịp trang trọng nha! 🎓🏮🇻🇳',
+    tags: ['#AoTac', '#LePhuc', '#VanMieu', '#TuHaoVietNam'],
+    timestamp: '5 giờ trước',
+    outfit: {
+      top: 'ao_tac',
+      bottom: 'quan_lua',
+      shoes: 'oxford',
+      accessories: ['khan_xep', 'quat_xep'],
+      topColor: COLOR_PALETTE[0], // Đỏ đô #7B1113
+      bottomColor: COLOR_PALETTE[4], // Trắng lụa #F5F5F5
+      gender: 'male'
+    },
+    likes: 329,
+    isLiked: true,
+    comments: [
+      { id: 'c3', author: 'Thanh Trúc', avatar: 'TT', text: 'Chuẩn quy thức lễ phục luôn anh ơi, 10 điểm uy nghiêm trang trọng!', time: '4 giờ trước' }
+    ]
+  },
+  {
+    id: 'post-3',
+    author: {
+      name: 'Mai Anh',
+      handle: '@maianh.retro',
+      avatar: 'MA',
+      badge: 'Cung Đình Creator 🌸'
+    },
+    caption: 'Đi lễ phủ Tây Hồ đầu tháng, mình chọn Áo Nhật Bình cổ chéo phối quần lụa trắng và cài trâm bạc hoa sen. Nhắc nhẹ các nàng: Nhật Bình là trang phục hoàng gia tôn nghiêm, chớ dại mix quần cộc hay dép lê kẻo bị Cố vấn Gemini nhắc nhở nha quý dzị 😂🌸',
+    tags: ['#NhatBinh', '#DiLeDauThang', '#ChuanMucDiSan', '#HaNoi'],
+    timestamp: '1 ngày trước',
+    outfit: {
+      top: 'ao_nhat_binh',
+      bottom: 'quan_lua',
+      shoes: 'hai_theu',
+      accessories: ['tram_cai', 'quat_xep'],
+      topColor: COLOR_PALETTE[2], // Xanh ngọc #40E0D0
+      bottomColor: COLOR_PALETTE[4], // Trắng lụa #F5F5F5
+      gender: 'female'
+    },
+    likes: 412,
+    isLiked: false,
+    comments: [
+      { id: 'c4', author: 'Quốc Đạt', avatar: 'QD', text: 'Nhật bình xanh ngọc quý phái thoát tục thật sự! Nhìn là thấy vibe hoàng tộc liền.', time: '20 giờ trước' },
+      { id: 'c5', author: 'Bảo Trân', avatar: 'BT', text: 'Cố vấn Gemini bắt lỗi chuẩn lắm, mặc vầy là bao đẹp đúng chuẩn!', time: '18 giờ trước' }
+    ]
+  },
+  {
+    id: 'post-4',
+    author: {
+      name: 'Bảo Nam',
+      handle: '@baonam.indie',
+      avatar: 'BN',
+      badge: 'Streetwear Vintage 🎸'
+    },
+    caption: 'Thử nghiệm chút phong cách dân dã Bắc Bộ kết hợp bụi bặm: Áo Tứ Thân nâu mix Quần jeans ống suông và túi tote canvas. Đi nghe nhạc acoustic cuối tuần vibe cực nghệ luôn anh em ạ! Vừa mộc mạc vừa cá tính 📻⚡',
+    tags: ['#TuThan', '#Streetwear', '#IndieVibe', '#PhucDung'],
+    timestamp: '2 ngày trước',
+    outfit: {
+      top: 'ao_tu_than',
+      bottom: 'quan_jeans',
+      shoes: 'sneaker_chunky',
+      accessories: ['tui_tote'],
+      topColor: COLOR_PALETTE[3], // Đen #111111
+      bottomColor: COLOR_PALETTE[3], // Đen #111111
+      gender: 'female'
+    },
+    likes: 156,
+    isLiked: false,
+    comments: [
+      { id: 'c6', author: 'Đức Huy', avatar: 'DH', text: 'Vibe mộc mạc mà chiến đét! Bấm thử mặc set này lên avatar liền nè 🔥', time: '1 ngày trước' }
+    ]
+  }
+];
+
+interface CommunityForumViewProps {
+  posts: ForumPost[];
+  onLikePost: (postId: string) => void;
+  onAddComment: (postId: string, text: string) => void;
+  onCloneOutfit: (outfit: OutfitState, authorName: string) => void;
+  onOpenVendorForOutfit: (outfit: OutfitState) => void;
+  onOpenCreatePost: () => void;
+  onGoToMixMatch: () => void;
+}
+
+export function CommunityForumView({
+  posts,
+  onLikePost,
+  onAddComment,
+  onCloneOutfit,
+  onOpenVendorForOutfit,
+  onOpenCreatePost,
+  onGoToMixMatch
+}: CommunityForumViewProps) {
+  const [filter, setFilter] = useState<'all' | 'trending' | 'street' | 'ceremony'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedCommentsId, setExpandedCommentsId] = useState<string | null>(null);
+  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
+
+  const filteredPosts = useMemo(() => {
+    let result = posts;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(p => 
+        p.author.name.toLowerCase().includes(q) ||
+        p.author.handle.toLowerCase().includes(q) ||
+        p.caption.toLowerCase().includes(q) ||
+        p.tags.some(t => t.toLowerCase().includes(q))
+      );
+    }
+    if (filter === 'trending') {
+      return [...result].sort((a, b) => b.likes - a.likes);
+    }
+    if (filter === 'street') {
+      return result.filter(p => p.tags.some(t => t.toLowerCase().includes('street') || t.toLowerCase().includes('cafe')));
+    }
+    if (filter === 'ceremony') {
+      return result.filter(p => p.tags.some(t => t.toLowerCase().includes('le') || t.toLowerCase().includes('chuan')));
+    }
+    return result;
+  }, [posts, filter, searchQuery]);
+
+  const handleSendComment = (postId: string) => {
+    const text = commentInputs[postId]?.trim();
+    if (!text) return;
+    onAddComment(postId, text);
+    setCommentInputs(prev => ({ ...prev, [postId]: '' }));
+  };
+
+  return (
+    <div className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
+      {/* THANH ĐIỀU KHIỂN TỐI GIẢN (KHÔNG KHUNG GIỚI THIỆU): TÌM KIẾM + NÚT ĐĂNG BÀI + NÚT SÀN PHỐI ĐỒ */}
+      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-amber-900/10 p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Thanh tìm kiếm bài viết */}
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm theo tác giả, nội dung bài viết, hashtag..."
+            className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl bg-[#FAF6EE] border border-amber-900/15 focus:bg-white focus:border-rose-600 focus:ring-1 focus:ring-rose-500/20 outline-none transition text-neutral-800 placeholder-neutral-400"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Giữ lại nút đăng bài chia sẻ và nút sàn phối đồ */}
+        <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-auto">
+          <button
+            type="button"
+            onClick={onOpenCreatePost}
+            className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-xs shadow-xs cursor-pointer active:scale-95 transition-all hover:-translate-y-0.5 flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Đăng bài chia sẻ</span>
+          </button>
+          <button
+            type="button"
+            onClick={onGoToMixMatch}
+            className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs shadow-xs cursor-pointer active:scale-95 transition-all hover:-translate-y-0.5 flex items-center gap-1.5"
+          >
+            <Shirt className="w-4 h-4" />
+            <span>Sàn phối đồ</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-neutral-200">
+        <div className="flex items-center gap-2 overflow-x-auto py-1">
+          <button
+            type="button"
+            onClick={() => setFilter('all')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+              filter === 'all'
+                ? 'bg-neutral-900 text-amber-300 shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+            }`}
+          >
+            Tất cả bài viết ({filteredPosts.length})
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilter('trending')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+              filter === 'trending'
+                ? 'bg-rose-700 text-white shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+            }`}
+          >
+            <span>Thịnh hành 🔥</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilter('street')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+              filter === 'street'
+                ? 'bg-amber-700 text-white shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+            }`}
+          >
+            <span>Dạo phố & Cafe ☕</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilter('ceremony')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+              filter === 'ceremony'
+                ? 'bg-purple-800 text-white shadow-xs'
+                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+            }`}
+          >
+            <span>Lễ hội & Cung đình 🏮</span>
+          </button>
+        </div>
+
+        <span className="text-xs text-neutral-500 font-medium hidden sm:inline-block">
+          Hiển thị <strong>{filteredPosts.length}</strong> bài đăng cảm hứng
+        </span>
+      </div>
+
+      {/* Posts Feed Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {filteredPosts.map(post => {
+          const topItem = culturalDatabase[post.outfit.top];
+          const bottomItem = culturalDatabase[post.outfit.bottom];
+          const shoeItem = culturalDatabase[post.outfit.shoes];
+          const harmony = evaluateColorHarmony(post.outfit.topColor, post.outfit.bottomColor);
+          const isCommentsOpen = expandedCommentsId === post.id;
+
+          return (
+            <article
+              key={post.id}
+              className="bg-white rounded-3xl border border-neutral-200/90 shadow-xs hover:shadow-md transition-all p-5 sm:p-6 flex flex-col justify-between space-y-4"
+            >
+              {/* Header Post: Tác giả & Thời gian */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-700 via-amber-600 to-amber-400 flex items-center justify-center text-white font-extrabold text-sm shadow-xs shrink-0">
+                    {post.author.avatar}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-bold text-neutral-900 truncate">
+                        {post.author.name}
+                      </h3>
+                      <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-rose-50 text-rose-800 border border-rose-200 shrink-0">
+                        {post.author.badge}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-neutral-500">
+                      <span>{post.author.handle}</span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {post.timestamp}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenVendorForOutfit(post.outfit)}
+                  className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold transition cursor-pointer flex items-center gap-1 shrink-0"
+                  title="Tìm tiệm cho thuê/may đo set đồ này"
+                >
+                  <Store className="w-3 h-3 text-emerald-600" />
+                  <span className="hidden sm:inline">Nơi thuê/may</span>
+                </button>
+              </div>
+
+              {/* Caption bài viết */}
+              <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed">
+                {post.caption}
+              </p>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-1.5">
+                {post.tags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    className="text-[11px] font-semibold text-rose-800 bg-rose-50/80 hover:bg-rose-100 px-2.5 py-0.5 rounded-full transition cursor-pointer"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              {/* Box Render Outfit & Chi tiết món đồ */}
+              <div className="p-3 sm:p-4 rounded-2xl bg-neutral-50 border border-neutral-200/80 flex flex-col sm:flex-row items-center gap-4">
+                {/* Avatar Preview */}
+                <div className="w-32 sm:w-36 shrink-0 flex justify-center py-1 bg-white rounded-xl border border-neutral-200/60 shadow-2xs">
+                  <AvatarComposite
+                    topId={post.outfit.top}
+                    bottomId={post.outfit.bottom}
+                    shoeId={post.outfit.shoes}
+                    accessoryIds={post.outfit.accessories}
+                    topColorHex={post.outfit.topColor.hex}
+                    bottomColorHex={post.outfit.bottomColor.hex}
+                    gender={post.outfit.gender}
+                    className="w-full max-w-[120px] aspect-[1/2]"
+                  />
+                </div>
+
+                {/* Outfit Info breakdown */}
+                <div className="flex-1 w-full space-y-2 text-xs">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Áo:</span>
+                    <span className="font-bold text-neutral-800 flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: post.outfit.topColor.hex }} />
+                      {topItem?.name || post.outfit.top}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Hạ phục:</span>
+                    <span className="font-bold text-neutral-800 flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: post.outfit.bottomColor.hex }} />
+                      {bottomItem?.name || post.outfit.bottom}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Giày dép:</span>
+                    <span className="font-semibold text-neutral-800">{shoeItem?.name || 'Tự do'}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-500">Màu sắc:</span>
+                    <span className={`px-2 py-0.2 rounded-full font-bold text-[10px] ${harmony.badgeClass}`}>
+                      {harmony.badge}
+                    </span>
+                  </div>
+
+                  {/* CTA "Thử mặc set này" ngay bên trong card */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => onCloneOutfit(post.outfit, post.author.name)}
+                      className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-neutral-900 to-neutral-800 hover:from-black hover:to-neutral-900 text-white font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-xs"
+                      title="Mặc set đồ này vào Avatar của bạn"
+                    >
+                      <Wand2 className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Thử mặc set này (Clone Outfit)</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Bar: Thả tim, Bình luận, Nơi thuê */}
+              <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onLikePost(post.id)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition cursor-pointer active:scale-90 font-bold ${
+                      post.isLiked
+                        ? 'text-rose-600 bg-rose-50 border border-rose-200'
+                        : 'text-neutral-600 hover:text-rose-600 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <Heart className={`w-4 h-4 ${post.isLiked ? 'fill-rose-600 text-rose-600' : ''}`} />
+                    <span>{post.likes}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setExpandedCommentsId(isCommentsOpen ? null : post.id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition cursor-pointer font-bold"
+                  >
+                    <MessageCircle className="w-4 h-4 text-neutral-500" />
+                    <span>{post.comments.length} bình luận</span>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenVendorForOutfit(post.outfit)}
+                  className="text-emerald-700 hover:text-emerald-800 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                >
+                  <Store className="w-3.5 h-3.5" />
+                  <span>Xem tiệm may</span>
+                </button>
+              </div>
+
+              {/* Khung bình luận (Inline comments drawer) */}
+              {isCommentsOpen && (
+                <div className="pt-3 border-t border-neutral-100 space-y-3 animate-fadeIn">
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {post.comments.map(c => (
+                      <div key={c.id} className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100 text-xs flex items-start gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-neutral-200 text-neutral-800 flex items-center justify-center font-bold text-[10px] shrink-0">
+                          {c.avatar}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-neutral-900">{c.author}</span>
+                            <span className="text-[10px] text-neutral-400">{c.time}</span>
+                          </div>
+                          <p className="text-neutral-700 mt-0.5">{c.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Input gửi bình luận mới */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="Viết bình luận cho bài đăng này..."
+                      value={commentInputs[post.id] || ''}
+                      onChange={e => setCommentInputs({ ...commentInputs, [post.id]: e.target.value })}
+                      onKeyDown={e => e.key === 'Enter' && handleSendComment(post.id)}
+                      className="flex-1 bg-neutral-100 border border-neutral-200 rounded-xl px-3 py-2 text-xs text-neutral-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleSendComment(post.id)}
+                      className="p-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white transition cursor-pointer shrink-0 shadow-2xs"
+                      title="Gửi bình luận"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Modal tạo bài viết chia sẻ lên Cộng đồng
+interface ShareToCommunityModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  currentOutfit: OutfitState;
+  onPublish: (caption: string, tags: string[]) => void;
+}
+
+export function ShareToCommunityModal({
+  isOpen,
+  onClose,
+  currentOutfit,
+  onPublish
+}: ShareToCommunityModalProps) {
+  const [caption, setCaption] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>(['#GenZRemix', '#VietVibe']);
+
+  const SUGGESTED_TAGS = ['#GenZRemix', '#VietVibe', '#PhoCo', '#LeHoi', '#NguThan', '#AoTac', '#NhatBinh', '#Streetwear'];
+
+  if (!isOpen) return null;
+
+  const topItem = culturalDatabase[currentOutfit.top];
+  const bottomItem = culturalDatabase[currentOutfit.bottom];
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
+  };
+
+  const handleConfirm = () => {
+    const finalCaption = caption.trim() || `Hôm nay mình phối ${topItem?.name || 'Áo cổ phục'} cùng ${bottomItem?.name || 'Hạ phục'}. Mọi người thấy vibe này thế nào? ✨`;
+    onPublish(finalCaption, selectedTags);
+    setCaption('');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[115] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+      <div 
+        className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-neutral-200 space-y-4 animate-scaleUp"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+          <div className="flex items-center gap-2 text-rose-800">
+            <Users className="w-5 h-5" />
+            <h3 className="text-base font-bold text-neutral-900 font-serif">
+              Chia Sẻ Lên Diễn Đàn Cộng Đồng 📸
+            </h3>
+          </div>
+          <button type="button" onClick={onClose} className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Preview Outfit nhỏ */}
+        <div className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200 flex items-center gap-3">
+          <div className="w-14 h-20 bg-white rounded-xl border border-neutral-200/80 flex items-center justify-center overflow-hidden shrink-0">
+            <AvatarComposite
+              topId={currentOutfit.top}
+              bottomId={currentOutfit.bottom}
+              shoeId={currentOutfit.shoes}
+              accessoryIds={currentOutfit.accessories}
+              topColorHex={currentOutfit.topColor.hex}
+              bottomColorHex={currentOutfit.bottomColor.hex}
+              gender={currentOutfit.gender}
+              className="w-full aspect-[1/2]"
+            />
+          </div>
+          <div className="text-xs space-y-1 min-w-0">
+            <span className="font-bold text-neutral-900 block truncate">
+              {topItem?.name || currentOutfit.top}
+            </span>
+            <span className="text-neutral-500 block truncate">
+              Phối cùng: {bottomItem?.name || currentOutfit.bottom}
+            </span>
+            <span className="text-[11px] text-amber-700 font-semibold block">
+              Màu: {currentOutfit.topColor.name} + {currentOutfit.bottomColor.name}
+            </span>
+          </div>
+        </div>
+
+        {/* Nhập Caption */}
+        <div className="space-y-1.5">
+          <label className="block text-xs font-bold text-neutral-700">
+            Caption chia sẻ của bạn:
+          </label>
+          <textarea
+            rows={3}
+            value={caption}
+            onChange={e => setCaption(e.target.value)}
+            placeholder="Chia sẻ lý do phối set đồ này, địa điểm đi cafe, chụp ảnh Tết..."
+            className="w-full p-3 rounded-xl border border-neutral-200 text-xs text-neutral-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+          />
+        </div>
+
+        {/* Gắn thẻ Tags */}
+        <div className="space-y-1.5">
+          <label className="block text-xs font-bold text-neutral-700">
+            Gắn thẻ chủ đề (Hashtags):
+          </label>
+          <div className="flex flex-wrap gap-1.5">
+            {SUGGESTED_TAGS.map(tag => (
+              <button
+                type="button"
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition cursor-pointer ${
+                  selectedTags.includes(tag)
+                    ? 'bg-rose-700 text-white shadow-2xs'
+                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Nút hành động */}
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="py-2.5 px-4 rounded-xl border border-neutral-200 text-neutral-700 font-bold text-xs hover:bg-neutral-50 transition"
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirm}
+            className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-700 to-amber-600 text-white font-bold text-xs hover:from-rose-800 hover:to-amber-700 transition shadow-xs"
+          >
+            Đăng lên Feed 🔥
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// TÍNH NĂNG NÂNG CAO 2: CỐ VẤN AI GEMINI (GEMINI AI ADVISOR)
+// ==========================================
+export interface ChatMessage {
+  id: string;
+  sender: 'user' | 'gemini';
+  text: string;
+  timestamp: string;
+}
+
+interface GeminiAdvisorDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  currentOutfit: OutfitState;
+  onAutoFixOutfit: () => void;
+  onShowToast: (msg: string) => void;
+}
+
+export function GeminiAdvisorDrawer({
+  isOpen,
+  onClose,
+  currentOutfit,
+  onAutoFixOutfit,
+  onShowToast
+}: GeminiAdvisorDrawerProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: 'm1',
+      sender: 'gemini',
+      text: 'Xin chào! Mình là Cố vấn AI Gemini của Việt Vibe. Mình am hiểu sâu sắc về 54 dân tộc, điển chế triều Nguyễn, thời Lê - Trần cũng như phong cách Mix & Match đương đại cho Gen Z. Bạn muốn mình phân tích set đồ đang mặc, chỉnh sửa chuẩn lễ nghi hay tìm hiểu điển tích nào?',
+      timestamp: 'Vừa xong'
+    }
+  ]);
+  const [input, setInput] = useState('');
+  const [isThinking, setIsThinking] = useState(false);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isThinking]);
+
+  if (!isOpen) return null;
+
+  const topItem = culturalDatabase[currentOutfit.top];
+  const bottomItem = culturalDatabase[currentOutfit.bottom];
+  const shoeItem = culturalDatabase[currentOutfit.shoes];
+  const harmony = evaluateColorHarmony(currentOutfit.topColor, currentOutfit.bottomColor);
+
+  const handleSendPrompt = async (promptText: string) => {
+    const userMsg: ChatMessage = {
+      id: `u-${Date.now()}`,
+      sender: 'user',
+      text: promptText,
+      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages(prev => [...prev, userMsg]);
+    setIsThinking(true);
+
+    const lower = promptText.toLowerCase();
+    if (lower.includes('sửa lỗi') || lower.includes('chuẩn hóa')) {
+      onAutoFixOutfit();
+      onShowToast('Gemini đã chuẩn hóa trang phục trên Avatar của bạn! 👑✨');
+    }
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: promptText,
+          currentOutfit: {
+            top: currentOutfit.top,
+            topName: topItem?.name || currentOutfit.top,
+            topColor: currentOutfit.topColor,
+            bottom: currentOutfit.bottom,
+            bottomName: bottomItem?.name || currentOutfit.bottom,
+            bottomColor: currentOutfit.bottomColor,
+            shoes: currentOutfit.shoes,
+            shoeName: shoeItem?.name || currentOutfit.shoes,
+            accessories: currentOutfit.accessories,
+            accessoryNames: currentOutfit.accessories.map(id => culturalDatabase[id]?.name || id),
+            gender: currentOutfit.gender,
+            harmonyTitle: harmony.title,
+          },
+          history: messages.slice(-6).map(m => ({
+            role: m.sender === 'user' ? 'user' : 'model',
+            text: m.text,
+          })),
+        }),
+      });
+
+      if (!res.ok) throw new Error('API /api/chat error');
+      const data = await res.json();
+      const replyText = data.reply || (
+        lower.includes('phân tích')
+          ? `🔍 **Phân tích set đồ:** Bạn đang diện ${topItem?.name || 'Áo cổ phục'} phối cùng ${bottomItem?.name || 'Hạ phục'}, tông màu ${currentOutfit.topColor.name} + ${currentOutfit.bottomColor.name} (${harmony.title}). Phối cùng ${shoeItem?.name || 'giày'} tạo phong thái rất đặc trưng!`
+          : `Chào bạn! Về câu hỏi "${promptText}", bạn có thể tự do phối hợp cổ phục với nét hiện đại để tạo nên phong cách độc đáo của riêng mình!`
+      );
+
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `g-${Date.now()}`,
+          sender: 'gemini',
+          text: replyText,
+          timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+    } catch {
+      // Fallback nếu ngoại tuyến hoặc server bận
+      let fallbackText = '';
+      if (lower.includes('phân tích set đồ') || lower.includes('phân tích')) {
+        const isConflict = topItem?.rules?.forbiddenPairs?.includes(currentOutfit.bottom);
+        fallbackText = `🔍 **PHÂN TÍCH CHUYÊN SÂU TỪ CỐ VẤN GEMINI**:\n\n` +
+          `1. **Thân Áo (${topItem?.name || currentOutfit.top})**:\n` +
+          `• Thời kỳ: ${topItem?.period || 'Cổ truyền'}. Thuộc tầng lớp: ${topItem?.socialClass?.join(', ') || 'Truyền thống'}.\n` +
+          `• Ý nghĩa: ${topItem?.culturalSignificance || topItem?.history || 'Trang phục di sản đặc trưng'}.\n\n` +
+          `2. **Sự kết hợp Hạ phục (${bottomItem?.name || currentOutfit.bottom})**:\n` +
+          `${isConflict ? `⚠️ **Cảnh báo chuẩn mực**: Bạn đang phối ${topItem?.name} với ${bottomItem?.name}. ${topItem?.rules?.conflictMessage || 'Cách phối này tạo độ lệch quy chuẩn lịch sử'}.` : `✨ **Đánh giá thẩm mỹ**: Phối cùng ${bottomItem?.name} tạo tổng thể hài hòa và tự nhiên.`}\n\n` +
+          `3. **Bản phối màu sắc**:\n` +
+          `• ${currentOutfit.topColor.name} + ${currentOutfit.bottomColor.name} => **${harmony.title}** (${harmony.description}).\n\n` +
+          `💡 **Lời khuyên của Stylist**: Nếu bạn muốn chỉnh về đúng chuẩn mực cung đình/lễ phục cổ truyền, hãy bấm chip *"Sửa lỗi set đồ này cho chuẩn"* để mình tự động cân chỉnh nhé!`;
+      } else if (lower.includes('sửa lỗi') || lower.includes('chuẩn')) {
+        fallbackText = `👑 **GEMINI ĐÃ TỰ ĐỘNG TINH CHỈNH SET ĐỒ CỦA BẠN VỀ CHUẨN MỰC**:\n\n` +
+          `✨ **Thay đổi đã áp dụng trực tiếp lên Avatar**:\n` +
+          `• Áo: Giữ nguyên **${topItem?.name || 'Áo cổ phục'}** làm linh hồn set đồ.\n` +
+          `• Hạ phục: Đổi sang **Quần lụa trắng** đoan trang, tạo vạt rủ thanh thoát.\n` +
+          `• Giày dép: Chuyển về **Hài thêu / Guốc mộc** đúng lễ nghi.\n` +
+          `• Phụ kiện: Đội khăn xếp/mấn và cầm quạt xếp tao nhã.\n\n` +
+          `🎉 Bản phối của bạn hiện đã đạt **100% chuẩn mực lễ nghi**, sẵn sàng cho các dịp dâng hương, chụp ảnh cung đình và lễ kỷ niệm trang trọng!`;
+      } else if (lower.includes('nhật bình') || lower.includes('điển tích')) {
+        fallbackText = `📜 **ĐIỂN TÍCH VỀ ÁO NHẬT BÌNH TRIỀU NGUYỄN**:\n\n` +
+          `• **Nguồn gốc tên gọi**: "Nhật Bình" bắt nguồn từ dạng cổ áo xẻ dọc, tạo thành hình chữ nhật lớn bao quanh cổ và ngực áo.\n` +
+          `• **Thứ bậc cung đình**: Được ban hành quy chế từ năm 1807 thời vua Gia Long, Nhật Bình là thường phục cao quý của bậc Hoàng Thái Hậu, Hoàng Hậu, Công chúa và mệnh phụ quan lại.\n` +
+          `• **Dải ngũ sắc diệu kỳ**: Viền tay áo có 5 dải màu (Lục, Vàng, Xanh, Trắng, Đỏ) đại diện cho **Ngũ hành tương sinh (Kim - Mộc - Thủy - Hỏa - Thổ)**, tượng trưng cho sự chở che và hài hòa vũ trụ.`;
+      } else {
+        fallbackText = `Chào bạn! Về "${promptText}", cổ phục Việt Nam là kho tàng phong phú và linh hoạt. Với tinh thần Gen Z, bạn hoàn toàn có thể kết hợp áo ngũ thân hoặc tứ thân cùng phụ kiện đương đại như sneaker, túi tote để tạo nên phong cách dạo phố độc đáo! 🌿`;
+      }
+
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `g-${Date.now()}`,
+          sender: 'gemini',
+          text: fallbackText,
+          timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+    } finally {
+      setIsThinking(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-y-0 right-0 z-[120] w-full sm:w-[480px] bg-white shadow-2xl flex flex-col border-l border-neutral-200 animate-slideLeft">
+      {/* Header Drawer */}
+      <div className="p-4 sm:p-5 bg-gradient-to-r from-rose-900 via-neutral-900 to-amber-900 text-white flex items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-rose-500 flex items-center justify-center text-white shadow-xs">
+            <Sparkles className="w-5 h-5 text-amber-200 animate-spin" style={{ animationDuration: '6s' }} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-sm sm:text-base font-serif">
+                Cố Vấn AI Gemini
+              </h3>
+              <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                Online
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-300">
+              Chuyên gia Sử liệu • Điển chế • Stylist Gen Z
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+          title="Đóng chatbox"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Messages Feed */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-neutral-100/50">
+        {messages.map(m => {
+          const isUser = m.sender === 'user';
+          return (
+            <div
+              key={m.id}
+              className={`flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : ''}`}
+            >
+              {!isUser && (
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-800 to-amber-500 flex items-center justify-center text-white shrink-0 shadow-2xs">
+                  <Sparkles className="w-4 h-4 text-amber-200" />
+                </div>
+              )}
+              <div
+                className={`max-w-[85%] p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed shadow-xs whitespace-pre-line ${
+                  isUser
+                    ? 'bg-gradient-to-r from-rose-800 to-rose-700 text-white rounded-tr-xs'
+                    : 'bg-white text-neutral-800 border border-neutral-200/80 rounded-tl-xs'
+                }`}
+              >
+                {m.text}
+                <div
+                  className={`text-[10px] mt-1 text-right ${
+                    isUser ? 'text-rose-200' : 'text-neutral-400'
+                  }`}
+                >
+                  {m.timestamp}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {isThinking && (
+          <div className="flex items-start gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-800 to-amber-500 flex items-center justify-center text-white shrink-0">
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
+            </div>
+            <div className="bg-white border border-neutral-200 p-3.5 rounded-2xl rounded-tl-xs text-xs text-neutral-600 flex items-center gap-2 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
+              <span>Gemini đang đối chiếu sử liệu và chuẩn tắc di sản... ⏳</span>
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* GỢI Ý CÂU HỎI (ĐƯỢC ĐẶT NGAY TRÊN KHUNG NHẬP CÂU HỎI) */}
+      <div className="px-3 pt-2.5 pb-2 bg-white border-t border-neutral-200/80 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+        <span className="text-[10px] font-bold text-neutral-400 shrink-0 uppercase tracking-wider flex items-center gap-1">
+          <Sparkles className="w-2.5 h-2.5 text-amber-600" /> Gợi ý:
+        </span>
+        <button
+          type="button"
+          onClick={() => handleSendPrompt('Phân tích chi tiết set đồ hiện tại của tôi')}
+          className="px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-[11px] font-bold text-rose-900 transition whitespace-nowrap cursor-pointer shrink-0 shadow-2xs flex items-center gap-1"
+        >
+          <Search className="w-3 h-3 text-rose-600" />
+          <span>Phân tích set đồ này</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSendPrompt('Sửa lỗi set đồ này cho chuẩn lễ phục')}
+          className="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] font-bold text-amber-900 transition whitespace-nowrap cursor-pointer shrink-0 shadow-2xs flex items-center gap-1"
+        >
+          <Wand2 className="w-3 h-3 text-amber-600" />
+          <span>Sửa lỗi chuẩn lễ phục</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSendPrompt('Kể điển tích về Áo Nhật Bình và dải ngũ sắc')}
+          className="px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-[11px] font-bold text-purple-900 transition whitespace-nowrap cursor-pointer shrink-0 shadow-2xs flex items-center gap-1"
+        >
+          <BookOpen className="w-3 h-3 text-purple-600" />
+          <span>Điển tích Nhật Bình</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSendPrompt('Tư vấn mix đồ đi cafe dạo phố cuối tuần cho Gen Z')}
+          className="px-2.5 py-1 rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-[11px] font-bold text-neutral-800 transition whitespace-nowrap cursor-pointer shrink-0 shadow-2xs"
+        >
+          ☕ Dạo phố Gen Z
+        </button>
+      </div>
+
+      {/* Input Chat */}
+      <div className="p-3 bg-white border-t border-neutral-100">
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            if (input.trim() && !isThinking) {
+              handleSendPrompt(input.trim());
+              setInput('');
+            }
+          }}
+          className="flex items-center gap-2"
+        >
+          <input
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Hỏi Gemini về quy chuẩn, điển tích hoặc cách phối..."
+            className="flex-1 bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-neutral-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || isThinking}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-800 to-amber-600 hover:from-rose-900 hover:to-amber-700 disabled:opacity-50 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-xs"
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Gửi</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export function getTomorrowDateString(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().slice(0, 10);
+}
+
+export function getTodayDateString(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export function getWeekendString(): string {
+  const d = new Date();
+  const day = d.getDay();
+  const daysUntilSaturday = (6 - day + 7) % 7 || 7;
+  const weekend = new Date(d);
+  weekend.setDate(d.getDate() + daysUntilSaturday);
+  return weekend.toISOString().slice(0, 10);
+}
+
+export const DEFAULT_INITIAL_OUTFIT: OutfitRecommendation = {
+  top: 'ao_ngu_than',
+  bottom: 'quan_jeans',
+  shoes: 'sneaker_low',
+  accessories: ['tai_nghe', 'kinh_ram'],
+};
+
+interface MixMatchScreenProps {
+  initialOutfit?: OutfitRecommendation;
+  onBack?: () => void;
+}
+
+export function MixMatchScreen({ initialOutfit = DEFAULT_INITIAL_OUTFIT, onBack }: MixMatchScreenProps = {}) {
+  // Điều hướng giữa các chế độ: 'onboarding' (Khởi tạo bối cảnh), 'mix_match' (Phối đồ), 'epic_library' (Thư viện sử thi), 'lookbook' (Lookbook của tôi), 'community' (Cộng đồng), 'stores' (Tiệm cổ phục)
+  const [viewMode, setViewMode] = useState<'onboarding' | 'mix_match' | 'epic_library' | 'lookbook' | 'community' | 'stores'>('onboarding');
+  const [onboardingResetKey, setOnboardingResetKey] = useState<number>(0);
+  const [isLoadingRecommendation, setIsLoadingRecommendation] = useState<boolean>(false);
+  const [chosenEvent, setChosenEvent] = useState<string>('');
+  const [chosenDate, setChosenDate] = useState<string>(getTomorrowDateString());
+  const [chosenLocation, setChosenLocation] = useState<string>('Hà Nội');
+  const [librarySelectedId, setLibrarySelectedId] = useState<string>('ao_nhat_binh');
+  const [hasStartedOutfit, setHasStartedOutfit] = useState<boolean>(false);
+  const [hoveredZone, setHoveredZone] = useState<'acc' | 'top' | 'bottom' | 'shoes' | null>(null);
+
+  // Tính năng 1: Diễn đàn cộng đồng
+  const [forumPosts, setForumPosts] = useState<ForumPost[]>(INITIAL_FORUM_POSTS);
+  const [isShareToCommunityOpen, setIsShareToCommunityOpen] = useState(false);
+
+  // Tính năng 2: Cố vấn AI Gemini
+  const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
+
+  // Tính năng 3: Gợi ý nhà cung cấp O2O
+  const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
+  const [vendorTargetOutfit, setVendorTargetOutfit] = useState<OutfitState | undefined>(undefined);
+
+  // Trạng thái lựa chọn món đồ - Khởi tạo từ initialOutfit do AI gợi ý hoặc mặc định
   const [selectedTop, setSelectedTop] = useState<string>(initialOutfit.top || 'ao_ngu_than');
   const [selectedBottom, setSelectedBottom] = useState<string>(initialOutfit.bottom || 'quan_lua');
   const [selectedAccessories, setSelectedAccessories] = useState<string[]>(() => {
@@ -2490,6 +4461,204 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Helper lấy outfit state hiện tại
+  const getCurrentOutfitState = (): OutfitState => ({
+    top: selectedTop,
+    bottom: selectedBottom,
+    shoes: selectedShoe,
+    accessories: [...selectedAccessories],
+    topColor,
+    bottomColor,
+    gender
+  });
+
+  // Điều hướng "Phối đồ": Nếu đang phối đồ dở thì quay lại bản phối dở; nếu chưa có thì mở Onboarding
+  const handleNavToPhoiDo = () => {
+    if (hasStartedOutfit) {
+      setViewMode('mix_match');
+    } else {
+      setViewMode('onboarding');
+    }
+  };
+
+  // Khởi tạo lại bối cảnh / Đổi bối cảnh khi người dùng chủ động yêu cầu
+  const handleResetContext = () => {
+    setOnboardingResetKey(prev => prev + 1);
+    setViewMode('onboarding');
+    setHasStartedOutfit(false);
+    if (onBack) onBack();
+  };
+
+  // Bắt đầu gợi ý AI từ Onboarding -> Loading -> chuyển tiếp sang màn hình Mix & Match
+  const handleStartRecommendation = async (
+    event: string, 
+    eventDate: string, 
+    location: string, 
+    preferredTop: string
+  ) => {
+    setChosenEvent(event);
+    setChosenDate(eventDate);
+    setChosenLocation(location);
+    setIsLoadingRecommendation(true);
+
+    const startTime = Date.now();
+
+    try {
+      const res = await fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event, eventDate, location, preferredTop }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.outfit) {
+          const elapsed = Date.now() - startTime;
+          const remainingDelay = Math.max(0, 1400 - elapsed);
+          setTimeout(() => {
+            if (data.outfit.top) setSelectedTop(data.outfit.top);
+            if (data.outfit.bottom) setSelectedBottom(data.outfit.bottom);
+            if (data.outfit.shoes) setSelectedShoe(data.outfit.shoes);
+            if (data.outfit.accessories) {
+              setSelectedAccessories(Array.isArray(data.outfit.accessories) ? data.outfit.accessories : [data.outfit.accessories]);
+            }
+            setHasStartedOutfit(true);
+            setIsLoadingRecommendation(false);
+            setViewMode('mix_match');
+            showToast(`Gemini AI đã phối trang phục hoàn hảo cho "${event}"! ✨`);
+          }, remainingDelay);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Backend API unavailable, using client-side fallback:', err);
+    }
+
+    setTimeout(() => {
+      const fallback = mockAIEngine(event, eventDate, location, preferredTop);
+      if (fallback.top) setSelectedTop(fallback.top);
+      if (fallback.bottom) setSelectedBottom(fallback.bottom);
+      if (fallback.shoes) setSelectedShoe(fallback.shoes);
+      if (fallback.accessories) {
+        setSelectedAccessories(Array.isArray(fallback.accessories) ? fallback.accessories : [fallback.accessories]);
+      }
+      setHasStartedOutfit(true);
+      setIsLoadingRecommendation(false);
+      setViewMode('mix_match');
+      showToast(`Gemini AI đã phối trang phục hoàn hảo cho "${event}"! ✨`);
+    }, 1600);
+  };
+
+  // Tương tác nút CTA "Liên hệ Đặt lịch" của Tiệm Cổ Phục
+  const handleCallStore = (store: VendorStore) => {
+    const msg = `Đang kết nối tới ${store.name} qua hotline ${store.phone}... 📞✨`;
+    showToast(msg);
+  };
+
+  // Tương tác like bài viết trên Diễn đàn
+  const handleLikePost = (postId: string) => {
+    setForumPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        const isLiked = !p.isLiked;
+        return {
+          ...p,
+          isLiked,
+          likes: isLiked ? p.likes + 1 : p.likes - 1
+        };
+      }
+      return p;
+    }));
+  };
+
+  // Tương tác comment bài viết
+  const handleAddComment = (postId: string, text: string) => {
+    const newComment: ForumComment = {
+      id: `c-${Date.now()}`,
+      author: 'Bạn (Gen Z Stylist)',
+      avatar: 'ME',
+      text,
+      time: 'Vừa xong'
+    };
+    setForumPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          comments: [...p.comments, newComment]
+        };
+      }
+      return p;
+    }));
+    showToast('Đã đăng bình luận của bạn lên bài viết! 💬');
+  };
+
+  // Clone outfit: Thử mặc set đồ từ Cộng đồng
+  const handleCloneOutfit = (outfit: OutfitState, authorName: string) => {
+    setSelectedTop(outfit.top);
+    setSelectedBottom(outfit.bottom);
+    setSelectedShoe(outfit.shoes);
+    setSelectedAccessories([...outfit.accessories]);
+    setTopColor(outfit.topColor);
+    setBottomColor(outfit.bottomColor);
+    setGender(outfit.gender);
+    setViewMode('mix_match');
+    showToast(`Đã sao chép và mặc set đồ của ${authorName} lên Avatar! 🪄✨`);
+  };
+
+  // Mở gợi ý tiệm may cho outfit cụ thể
+  const handleOpenVendorForOutfit = (outfit: OutfitState) => {
+    setVendorTargetOutfit(outfit);
+    setIsVendorModalOpen(true);
+  };
+
+  // Mở gợi ý tiệm may cho outfit đang mặc
+  const handleOpenVendorCurrent = () => {
+    setVendorTargetOutfit(getCurrentOutfitState());
+    setIsVendorModalOpen(true);
+  };
+
+  // Cố vấn Gemini tự động chuẩn hóa set đồ
+  const handleAutoFixFromAdvisor = () => {
+    if (selectedTop === 'ao_nhat_binh' || selectedTop === 'ao_tac') {
+      setSelectedBottom('quan_lua');
+      setSelectedShoe('oxford');
+      setSelectedAccessories(['tram_cai', 'quat_xep']);
+      setTopColor(COLOR_PALETTE[0]); // Đỏ đô
+      setBottomColor(COLOR_PALETTE[4]); // Trắng lụa
+    } else if (selectedTop === 'ao_tu_than') {
+      setSelectedBottom('vay_dup');
+      setSelectedShoe('guoc_moc');
+      setSelectedAccessories(['non_quai_thao']);
+      setBottomColor(COLOR_PALETTE[3]); // Đen
+    } else {
+      setSelectedBottom('quan_lua');
+      setSelectedShoe('guoc_moc');
+      setSelectedAccessories(['khan_xep']);
+      setBottomColor(COLOR_PALETTE[4]);
+    }
+  };
+
+  // Đăng outfit lên Diễn đàn cộng đồng
+  const handlePublishToCommunity = (caption: string, tags: string[]) => {
+    const newPost: ForumPost = {
+      id: `post-${Date.now()}`,
+      author: {
+        name: 'Bạn (Gen Z Stylist)',
+        handle: '@you.vietvibe',
+        avatar: 'ME',
+        badge: 'Tác giả mới ✨'
+      },
+      caption,
+      tags,
+      timestamp: 'Vừa xong',
+      outfit: getCurrentOutfitState(),
+      likes: 1,
+      isLiked: true,
+      comments: []
+    };
+    setForumPosts(prev => [newPost, ...prev]);
+    showToast('Đã đăng bản phối của bạn lên Diễn đàn Cộng đồng thành công! 🎉🔥');
   };
 
   // Lưu bản nháp (tối đa 2 set đồ)
@@ -2735,17 +4904,17 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
   return (
     <div className="min-h-screen bg-neutral-100 flex flex-col font-sans text-neutral-800">
       {/* HEADER */}
-      <header className="bg-white/95 backdrop-blur-md border-b border-neutral-200 sticky top-0 z-50 px-4 lg:px-8 py-3 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-800 via-amber-600 to-amber-400 flex items-center justify-center text-white shadow-sm font-bold text-lg">
+      <header className="bg-white/95 backdrop-blur-md border-b border-neutral-200 sticky top-0 z-50 px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 shadow-xs">
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl bg-gradient-to-tr from-rose-800 via-amber-600 to-amber-400 flex items-center justify-center text-white shadow-sm font-bold text-base sm:text-lg">
             VV
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg lg:text-xl font-bold tracking-tight text-neutral-900 font-serif">
+              <h1 className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-neutral-900 font-serif">
                 Việt Vibe
               </h1>
-              <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-full font-semibold border border-neutral-200">
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-wider px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-full font-semibold border border-neutral-200">
                 Gen Z Edition
               </span>
             </div>
@@ -2755,62 +4924,70 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
           </div>
         </div>
 
-        {/* NAVBAR ĐIỀU HƯỚNG GIỮA 3 MÀN HÌNH: "PHỐI ĐỒ", "THƯ VIỆN SỬ THI" VÀ "LOOKBOOK" */}
-        <nav className="flex items-center gap-1.5 bg-neutral-100 p-1 rounded-2xl border border-neutral-200 shadow-2xs">
+        {/* NAVBAR ĐIỀU HƯỚNG GIỮA CÁC MÀN HÌNH: "PHỐI ĐỒ", "THƯ VIỆN SỬ THI", "LOOKBOOK", "CỘNG ĐỒNG", "TIỆM CỔ PHỤC" */}
+        <nav className="flex items-center gap-1 sm:gap-2.5 bg-neutral-200/70 p-1 sm:p-1.5 rounded-2xl border border-neutral-300/50 shadow-xs backdrop-blur-md overflow-x-auto scrollbar-none w-full sm:w-auto shrink-0">
           <button
             type="button"
-            onClick={() => setViewMode('mix_match')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-              viewMode === 'mix_match'
-                ? 'bg-white text-rose-900 shadow-xs ring-1 ring-neutral-200'
-                : 'text-neutral-600 hover:text-neutral-900'
+            onClick={handleNavToPhoiDo}
+            className={`px-3 sm:px-4.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+              viewMode === 'onboarding' || viewMode === 'mix_match'
+                ? 'bg-neutral-900 text-amber-300 shadow-md ring-1 ring-black/20'
+                : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/70'
             }`}
           >
-            <Shirt className="w-3.5 h-3.5" />
             <span>Phối đồ</span>
+            {hasStartedOutfit && viewMode !== 'mix_match' && (
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" title="Đang có bản phối dở" />
+            )}
           </button>
           <button
             type="button"
             onClick={() => setViewMode('epic_library')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+            className={`px-3 sm:px-4.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap ${
               viewMode === 'epic_library'
-                ? 'bg-white text-rose-900 shadow-xs ring-1 ring-neutral-200'
-                : 'text-neutral-600 hover:text-neutral-900'
+                ? 'bg-neutral-900 text-amber-300 shadow-md ring-1 ring-black/20'
+                : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/70'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5" />
             <span>Thư viện sử thi</span>
-            <span className="px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded-full text-[10px] font-extrabold border border-amber-200">
-              14 trường
-            </span>
           </button>
           <button
             type="button"
             onClick={() => setViewMode('lookbook')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+            className={`px-3 sm:px-4.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap ${
               viewMode === 'lookbook'
-                ? 'bg-white text-rose-900 shadow-xs ring-1 ring-neutral-200'
-                : 'text-neutral-600 hover:text-neutral-900'
+                ? 'bg-neutral-900 text-amber-300 shadow-md ring-1 ring-black/20'
+                : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/70'
             }`}
           >
-            <Bookmark className="w-3.5 h-3.5" />
-            <span>Lookbook của tôi</span>
-            <span className="px-1.5 py-0.2 bg-rose-100 text-rose-800 rounded-full text-[10px] font-extrabold border border-rose-200">
-              {myLookbook.length}
-            </span>
+            <span>Lookbook</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('community')}
+            className={`px-3 sm:px-4.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap ${
+              viewMode === 'community'
+                ? 'bg-neutral-900 text-amber-300 shadow-md ring-1 ring-black/20'
+                : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/70'
+            }`}
+          >
+            <span>Cộng đồng</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('stores')}
+            className={`px-3 sm:px-4.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap ${
+              viewMode === 'stores'
+                ? 'bg-neutral-900 text-amber-300 shadow-md ring-1 ring-black/20'
+                : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/70'
+            }`}
+          >
+            <span>Tiệm cổ phục</span>
           </button>
         </nav>
 
-        {/* Action presets and Back button: Nút quay lại tại top bar */}
-        <div>
-          <button
-            onClick={onBack}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white shadow-xs transition cursor-pointer active:scale-95"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Quay lại</span>
-          </button>
-        </div>
+        {/* Khung bên phải thanh nav - Tối giản không text rườm rà */}
+        <div className="w-2 hidden lg:block" />
       </header>
 
       {/* TOAST MESSAGE THÔNG BÁO TƯƠNG TÁC GEN Z */}
@@ -2821,12 +4998,49 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
         </div>
       )}
 
-      {/* HIỂN THỊ CHẾ ĐỘ THƯ VIỆN SỬ THI / LOOKBOOK / MÀN HÌNH PHỐI ĐỒ */}
-      {viewMode === 'epic_library' ? (
+      {/* NÚT NỔI: QUAY LẠI BẢN PHỐI ĐANG DỞ TỪ MỌI MÀN HÌNH NGOÀI PHỐI ĐỒ */}
+      {hasStartedOutfit && viewMode !== 'mix_match' && viewMode !== 'onboarding' && (
+        <div className="fixed bottom-6 left-6 z-[100] animate-fadeIn">
+          <button
+            type="button"
+            onClick={() => setViewMode('mix_match')}
+            className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-neutral-900/95 text-white hover:bg-black text-xs font-bold shadow-xl border border-amber-400/30 backdrop-blur-md hover:-translate-y-0.5 transition cursor-pointer"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Đang phối dở: <span className="text-amber-300">{currentTopItem?.name}</span></span>
+            <span className="bg-amber-400 text-neutral-950 px-2 py-0.5 rounded-md text-[10px] font-extrabold ml-1">
+              Phối tiếp ↗
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* HIỂN THỊ CHẾ ĐỘ ONBOARDING / THƯ VIỆN SỬ THI / LOOKBOOK / CỘNG ĐỒNG / TIỆM CỔ PHỤC / MÀN HÌNH PHỐI ĐỒ */}
+      {viewMode === 'onboarding' ? (
+        isLoadingRecommendation ? (
+          <LoadingScreen 
+            eventText={chosenEvent} 
+            eventDate={chosenDate} 
+            location={chosenLocation} 
+          />
+        ) : (
+          <OnboardingScreen 
+            key={onboardingResetKey}
+            onStartRecommendation={handleStartRecommendation} 
+            hideHeader={true}
+            hasInProgressOutfit={hasStartedOutfit}
+            currentOutfitDesc={`${currentTopItem?.name || 'Áo'} + ${currentBottomItem?.name || 'Hạ phục'}`}
+            onContinueOutfit={() => setViewMode('mix_match')}
+          />
+        )
+      ) : viewMode === 'epic_library' ? (
         <EpicLibraryView
           selectedId={librarySelectedId}
           onSelectId={setLibrarySelectedId}
           onEquipItem={handleEquipFromLibrary}
+          onBackToMixMatch={() => setViewMode('mix_match')}
+          hasInProgressOutfit={hasStartedOutfit}
+          currentOutfitDesc={`${currentTopItem?.name || 'Áo'} + ${currentBottomItem?.name || 'Hạ phục'}`}
         />
       ) : viewMode === 'lookbook' ? (
         <LookbookView
@@ -2834,6 +5048,26 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
           onEquipOutfit={handleEquipFromLookbook}
           onDeleteOutfit={handleDeleteLookbook}
           onShareOutfit={handleShareLookbook}
+          onOpenVendor={handleOpenVendorForOutfit}
+          onGoToMixMatch={() => setViewMode('mix_match')}
+          onUpdateName={(id, newName) => {
+            setMyLookbook(prev => prev.map(item => item.id === id ? { ...item, name: newName } : item));
+            showToast(`Đã đổi tên bản phối thành "${newName}" ✨`);
+          }}
+        />
+      ) : viewMode === 'community' ? (
+        <CommunityForumView
+          posts={forumPosts}
+          onLikePost={handleLikePost}
+          onAddComment={handleAddComment}
+          onCloneOutfit={handleCloneOutfit}
+          onOpenVendorForOutfit={handleOpenVendorForOutfit}
+          onOpenCreatePost={() => setIsShareToCommunityOpen(true)}
+          onGoToMixMatch={() => setViewMode('mix_match')}
+        />
+      ) : viewMode === 'stores' ? (
+        <StoreLocatorScreen
+          onCallStore={handleCallStore}
           onGoToMixMatch={() => setViewMode('mix_match')}
         />
       ) : (
@@ -2841,85 +5075,69 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
       <main className="flex-1 max-w-7xl w-full mx-auto p-3 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start relative z-0">
         
         {/* CỘT TRÁI (LIVE PREVIEW - 40% ~ 5/12) */}
-        <section className="lg:col-span-5 bg-white rounded-3xl border border-neutral-200 p-4 lg:p-6 shadow-sm flex flex-col items-center relative isolate overflow-hidden">
+        <section className="lg:col-span-5 bg-white/85 backdrop-blur-md rounded-3xl border border-amber-900/10 p-4 lg:p-6 shadow-md flex flex-col items-center relative isolate overflow-hidden">
           
-          {/* Header Preview & Tên Outfit */}
-          <div className="w-full pb-3 border-b border-neutral-100 mb-3 space-y-2.5">
-            {/* Hàng 1: Tên Khung hình thời trang & Bộ chọn giới tính Nam/Nữ */}
-            <div className="w-full flex items-center justify-between gap-2 min-w-0">
-              <div className="min-w-0 flex-1 pr-1">
-                <span className="text-[11px] font-semibold text-rose-700 tracking-wider uppercase block">
-                  Khung Hình Thời Trang
-                </span>
-                <h2 
-                  className="text-sm font-bold text-neutral-900 truncate"
-                  title={`${currentTopItem?.name || ''} × ${currentBottomItem?.name || ''}`}
-                >
-                  {currentTopItem?.name} × {currentBottomItem?.name}
-                </h2>
-              </div>
-
-              {/* LỰA CHỌN GIỚI TÍNH */}
-              <div className="shrink-0 bg-neutral-100 p-0.5 rounded-xl flex items-center text-xs font-semibold">
-                <button
-                  type="button"
-                  onClick={() => setGender('female')}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
-                    gender === 'female'
-                      ? 'bg-white text-rose-700 shadow-xs'
-                      : 'text-neutral-500 hover:text-neutral-800'
-                  }`}
-                  title="Avatar Nữ"
-                >
-                  <span>👩</span>
-                  <span className="text-[11px]">Nữ</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setGender('male')}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
-                    gender === 'male'
-                      ? 'bg-white text-sky-700 shadow-xs'
-                      : 'text-neutral-500 hover:text-neutral-800'
-                  }`}
-                  title="Avatar Nam"
-                >
-                  <span>👨</span>
-                  <span className="text-[11px]">Nam</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Hàng 2: Button ghi rõ 'Quay về gợi ý ban đầu' */}
-            <div className="w-full flex items-center justify-end">
+          {/* Header Preview: Bộ chọn giới tính Nam/Nữ & Nút Quay về gợi ý ban đầu */}
+          <div className="w-full pb-3 border-b border-neutral-100/80 mb-3 flex items-center justify-between gap-2">
+            {/* LỰA CHỌN GIỚI TÍNH */}
+            <div className="bg-neutral-100/90 p-0.5 rounded-xl flex items-center text-xs font-semibold shadow-inner">
               <button
                 type="button"
-                onClick={() => {
-                  setSelectedTop(initialOutfit.top || 'ao_ngu_than');
-                  setSelectedBottom(initialOutfit.bottom || 'quan_lua');
-                  setSelectedShoe(initialOutfit.shoes || 'sneaker_low');
-                  setSelectedAccessories(
-                    Array.isArray(initialOutfit.accessories)
-                      ? initialOutfit.accessories
-                      : initialOutfit.accessories
-                      ? [initialOutfit.accessories]
-                      : []
-                  );
-                }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-700 hover:text-rose-700 bg-neutral-100 hover:bg-neutral-200/80 border border-neutral-200/70 transition shadow-2xs cursor-pointer active:scale-95"
-                title="Khôi phục gợi ý trang phục ban đầu"
+                onClick={() => setGender('female')}
+                className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
+                  gender === 'female'
+                    ? 'bg-rose-900 text-white shadow-xs'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+                title="Avatar Nữ"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-neutral-500" />
-                <span>Quay về gợi ý ban đầu</span>
+                <span>👩</span>
+                <span className="text-[11px] font-bold">Nữ</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setGender('male')}
+                className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
+                  gender === 'male'
+                    ? 'bg-neutral-900 text-amber-300 shadow-xs'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+                title="Avatar Nam"
+              >
+                <span>👨</span>
+                <span className="text-[11px] font-bold">Nam</span>
               </button>
             </div>
+
+            {/* Button ghi rõ 'Quay về gợi ý ban đầu' */}
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedTop(initialOutfit.top || 'ao_ngu_than');
+                setSelectedBottom(initialOutfit.bottom || 'quan_lua');
+                setSelectedShoe(initialOutfit.shoes || 'sneaker_low');
+                setSelectedAccessories(
+                  Array.isArray(initialOutfit.accessories)
+                    ? initialOutfit.accessories
+                    : initialOutfit.accessories
+                    ? [initialOutfit.accessories]
+                    : []
+                );
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-700 hover:text-neutral-950 bg-neutral-100 hover:bg-neutral-200/80 border border-neutral-200/70 transition shadow-2xs cursor-pointer active:scale-95"
+              title="Khôi phục gợi ý trang phục ban đầu"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-neutral-500" />
+              <span>Quay về gợi ý ban đầu</span>
+            </button>
           </div>
 
-          {/* VÙNG AVATAR SVG CANVAS (TẤT CẢ DÙNG CHUNG VIEWBOX 0 0 300 600) */}
-          <div className="relative isolate w-full max-w-[320px] aspect-[1/2] bg-radial from-neutral-50 to-neutral-200/70 rounded-2xl border border-neutral-200/80 shadow-inner flex items-center justify-center p-2 overflow-hidden">
+          {/* VÙNG AVATAR SVG CANVAS (KHUNG MÀU SÁNG, DI CHUYỂN VÀO TỪNG VÙNG HIỂN THỊ TÊN & BẤM XEM THÔNG TIN) */}
+          <div className="relative isolate w-full max-w-[320px] aspect-[1/2] rounded-3xl border border-amber-900/15 bg-gradient-to-b from-[#FAF7F2] via-[#F5EFEB] to-[#ECE5DC] shadow-lg flex items-center justify-center p-2 overflow-hidden ring-1 ring-amber-900/10 group">
             
-            {/* Lưới sàn thẩm mỹ tối giản */}
-            <div className="absolute bottom-6 inset-x-8 h-8 rounded-[100%] bg-neutral-300/40 blur-[3px] pointer-events-none" />
+            {/* Họa tiết lưới nhẹ & Sàn pedestal phát sáng ấm áp */}
+            <div className="absolute inset-0 bg-[radial-gradient(#b45309_0.75px,transparent_0.75px)] [background-size:16px_16px] opacity-15 pointer-events-none" />
+            <div className="absolute bottom-6 inset-x-8 h-8 rounded-[100%] bg-amber-400/25 blur-md pointer-events-none" />
 
             {/* Z-INDEX 10: BASE AVATAR THEO GIỚI TÍNH & TƯ THẾ (Chắp tay cho tất cả trang phục) */}
             <div className="absolute inset-0 z-10 pointer-events-none">
@@ -2946,49 +5164,76 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
               <ShoeSvg itemId={selectedShoe} />
             </div>
 
-            {/* Z-INDEX 40: PHỤ KIỆN (NGOÀI CÙNG - HỖ TRỢ ĐA PHỤ KIỆN, ĐƯỢC CÔ LẬP TRONG STACKING CONTEXT) */}
+            {/* Z-INDEX 40: PHỤ KIỆN (NGOÀI CÙNG - HỖ TRỢ ĐA PHỤ KIỆN) */}
             <div className="absolute inset-0 z-40 pointer-events-none">
               <AccessorySvg itemIds={selectedAccessories} />
             </div>
-          </div>
 
-          {/* CHÚ THÍCH CÁC MÓN ĐỒ ĐANG MẶC TRÊN NGƯỜI */}
-          <div className="w-full mt-4 pt-3 border-t border-neutral-100">
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: topColor.hex }} />
-                <div className="truncate">
-                  <div className="text-[10px] text-neutral-400 font-medium">Áo</div>
-                  <div className="font-semibold text-neutral-800 truncate">{currentTopItem?.name}</div>
-                </div>
+            {/* VÙNG TƯƠNG TÁC 1: ĐỘI ĐẦU & PHỤ KIỆN (0 - 25%) */}
+            <div 
+              className="absolute top-0 inset-x-0 h-[25%] z-50 cursor-pointer"
+              onMouseEnter={() => setHoveredZone('acc')}
+              onMouseLeave={() => setHoveredZone(null)}
+              onClick={() => {
+                if (currentAccItems.length > 0) {
+                  setInfoItem(currentAccItems[0]);
+                } else {
+                  setActiveTab('phukien');
+                }
+              }}
+              title="Bấm để xem thông tin chi tiết phụ kiện"
+            >
+              <div className={`absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-neutral-900/90 text-white text-[11px] font-semibold tracking-wide shadow-lg border border-amber-400/30 backdrop-blur-md transition-all duration-200 pointer-events-none whitespace-nowrap z-60 ${hoveredZone === 'acc' ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-1'}`}>
+                <span>✨ {selectedAccessories.length > 0 ? currentAccItems.map(i => i.name).join(', ') : 'Chưa chọn phụ kiện'}</span>
+                <span className="text-[10px] text-amber-300 ml-1.5 underline">Xem thông tin</span>
               </div>
-              <div className="p-2 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: bottomColor.hex }} />
-                <div className="truncate">
-                  <div className="text-[10px] text-neutral-400 font-medium">Hạ phục</div>
-                  <div className="font-semibold text-neutral-800 truncate">{currentBottomItem?.name}</div>
-                </div>
+            </div>
+
+            {/* VÙNG TƯƠNG TÁC 2: ÁO NGOÀI (25% - 55%) */}
+            <div 
+              className="absolute top-[25%] inset-x-0 h-[30%] z-50 cursor-pointer"
+              onMouseEnter={() => setHoveredZone('top')}
+              onMouseLeave={() => setHoveredZone(null)}
+              onClick={() => {
+                if (currentTopItem) setInfoItem(currentTopItem);
+              }}
+              title="Bấm để xem thông tin chi tiết áo"
+            >
+              <div className={`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-neutral-900/90 text-white text-[11px] font-semibold tracking-wide shadow-lg border border-amber-400/30 backdrop-blur-md transition-all duration-200 pointer-events-none whitespace-nowrap z-60 ${hoveredZone === 'top' ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+                <span>👘 {currentTopItem?.name} ({topColor.name})</span>
+                <span className="text-[10px] text-amber-300 ml-1.5 underline">Xem thông tin</span>
               </div>
-              <div className="p-2 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center gap-2">
-                <Glasses className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                <div className="truncate">
-                  <div className="text-[10px] text-neutral-400 font-medium">
-                    Phụ kiện ({selectedAccessories.length})
-                  </div>
-                  <div 
-                    className="font-semibold text-neutral-800 truncate"
-                    title={currentAccItems.length > 0 ? currentAccItems.map(i => i.name).join(', ') : 'Không dùng'}
-                  >
-                    {selectedAccessories.length === 0 ? 'Không chọn' : currentAccItems.map(i => i.name).join(', ')}
-                  </div>
-                </div>
+            </div>
+
+            {/* VÙNG TƯƠNG TÁC 3: QUẦN / VÁY (55% - 82%) */}
+            <div 
+              className="absolute top-[55%] inset-x-0 h-[27%] z-50 cursor-pointer"
+              onMouseEnter={() => setHoveredZone('bottom')}
+              onMouseLeave={() => setHoveredZone(null)}
+              onClick={() => {
+                if (currentBottomItem) setInfoItem(currentBottomItem);
+              }}
+              title="Bấm để xem thông tin chi tiết hạ phục"
+            >
+              <div className={`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-neutral-900/90 text-white text-[11px] font-semibold tracking-wide shadow-lg border border-amber-400/30 backdrop-blur-md transition-all duration-200 pointer-events-none whitespace-nowrap z-60 ${hoveredZone === 'bottom' ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+                <span>👖 {currentBottomItem?.name} ({bottomColor.name})</span>
+                <span className="text-[10px] text-amber-300 ml-1.5 underline">Xem thông tin</span>
               </div>
-              <div className="p-2 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center gap-2">
-                <Footprints className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                <div className="truncate">
-                  <div className="text-[10px] text-neutral-400 font-medium">Giày dép</div>
-                  <div className="font-semibold text-neutral-800 truncate">{currentShoeItem?.name}</div>
-                </div>
+            </div>
+
+            {/* VÙNG TƯƠNG TÁC 4: GIÀY DÉP (82% - 100%) */}
+            <div 
+              className="absolute top-[82%] inset-x-0 h-[18%] z-50 cursor-pointer"
+              onMouseEnter={() => setHoveredZone('shoes')}
+              onMouseLeave={() => setHoveredZone(null)}
+              onClick={() => {
+                if (currentShoeItem) setInfoItem(currentShoeItem);
+              }}
+              title="Bấm để xem thông tin chi tiết giày dép"
+            >
+              <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-neutral-900/90 text-white text-[11px] font-semibold tracking-wide shadow-lg border border-amber-400/30 backdrop-blur-md transition-all duration-200 pointer-events-none whitespace-nowrap z-60 ${hoveredZone === 'shoes' ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-1'}`}>
+                <span>👞 {currentShoeItem?.name}</span>
+                <span className="text-[10px] text-amber-300 ml-1.5 underline">Xem thông tin</span>
               </div>
             </div>
           </div>
@@ -3043,72 +5288,109 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
               </div>
             )}
           </div>
+
+          {/* CÁC TÙY CHỌN ĐƯỢC CHUYỂN XUỐNG DƯỚI PHẦN CẢNH BÁO: LƯU BẢN NHÁP, SO SÁNH, THUÊ/MAY Ở ĐÂU?, ĐĂNG LÊN FEED, LƯU VÀO LOOKBOOK */}
+          <div className="w-full mt-4 pt-4 border-t border-neutral-200/80 space-y-2.5">
+            <div className="grid grid-cols-2 gap-2">
+              {/* Nút Lưu bản nháp */}
+              <button
+                type="button"
+                onClick={handleSaveDraft}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold text-neutral-800 bg-[#FAF6EE] hover:bg-white border border-amber-900/15 shadow-2xs hover:shadow-xs transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95"
+                title="Lưu set đồ hiện tại vào bộ nhớ so sánh tạm thời"
+              >
+                <Bookmark className="w-3.5 h-3.5 text-amber-600" />
+                <span>Lưu bản nháp ({draftOutfits.length}/2)</span>
+              </button>
+
+              {/* Nút So sánh phương án */}
+              <button
+                type="button"
+                onClick={handleOpenCompare}
+                className={`inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95 shadow-2xs ${
+                  draftOutfits.length > 0
+                    ? 'bg-amber-400 hover:bg-amber-300 text-neutral-950 font-extrabold shadow-sm'
+                    : 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                }`}
+                title="Mở modal so sánh song song 2 bản phối"
+              >
+                <Scale className="w-3.5 h-3.5" />
+                <span>So sánh ({draftOutfits.length})</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {/* Thuê / May ở đâu? (Bỏ icon thứ 2 sau text) */}
+              <button
+                type="button"
+                onClick={handleOpenVendorCurrent}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 shadow-2xs transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95"
+                title="Gợi ý xưởng may đo & tiệm cho thuê cổ phục uy tín gần bạn"
+              >
+                <Store className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Thuê/May ở đâu?</span>
+              </button>
+
+              {/* Đăng lên feed (Bỏ icon thứ 2 sau text) */}
+              <button
+                type="button"
+                onClick={() => setIsShareToCommunityOpen(true)}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 shadow-2xs transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95"
+                title="Đăng set đồ này lên Diễn đàn cộng đồng"
+              >
+                <Users className="w-3.5 h-3.5 text-purple-700" />
+                <span>Đăng lên Feed</span>
+              </button>
+            </div>
+
+            {/* Lưu vào Lookbook (Bỏ icon thứ 2 sau text) */}
+            <button
+              type="button"
+              onClick={handleOpenSaveLookbook}
+              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-rose-900 via-rose-800 to-amber-700 hover:from-rose-950 hover:to-amber-800 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer active:scale-95"
+              title="Lưu set đồ này vào Lookbook Việt Vibe cá nhân"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>Lưu vào Lookbook</span>
+            </button>
+          </div>
         </section>
 
         {/* CỘT PHẢI (CONTROL PANEL - 60% ~ 7/12) */}
         <div className="lg:col-span-7 space-y-4 flex flex-col">
-          {/* BOX BỐI CẢNH, THỜI TIẾT & GỢI Ý CỦA AI STYLIST (NGAY TRÊN BOX CHỌN TRANG PHỤC) */}
-          <div className="bg-gradient-to-br from-amber-50/90 via-rose-50/40 to-amber-50/70 rounded-3xl border border-amber-200/90 p-4 lg:p-5 shadow-xs">
-            <div className="flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-rose-700 via-rose-600 to-amber-500 flex items-center justify-center text-white shrink-0 shadow-xs mt-0.5">
-                <Sparkles className="w-4 h-4" />
+          {/* THÔNG TIN BỐI CẢNH NGẮN GỌN PHÍA TRÊN CÁC THANH CHỌN ĐỒ */}
+          <div className="p-3.5 rounded-2xl bg-[#FAF6EE] border border-amber-900/15 flex flex-wrap items-center justify-between gap-2 text-xs shadow-2xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-rose-800 text-white flex items-center justify-center text-sm font-bold shrink-0 shadow-xs">
+                📍
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="text-[11px] font-bold text-rose-800 uppercase tracking-wider bg-rose-100/90 px-2.5 py-0.5 rounded-full border border-rose-200">
-                    AI Stylist Gợi Ý
-                  </span>
-
-                  {initialOutfit.contextEvent && (
-                    <span className="text-xs font-semibold text-neutral-800 bg-white px-2.5 py-0.5 rounded-full border border-neutral-200/90 flex items-center gap-1">
-                      <span>🎯 Bối cảnh:</span>
-                      <span className="text-rose-900 font-bold">{initialOutfit.contextEvent}</span>
-                    </span>
-                  )}
-
-                  {initialOutfit.location && (
-                    <span className="text-xs text-neutral-600 bg-white px-2.5 py-0.5 rounded-full border border-neutral-200 flex items-center gap-1">
-                      <span>📍</span>
-                      <span>{initialOutfit.location}</span>
-                    </span>
-                  )}
-
-                  {initialOutfit.eventDate && (
-                    <span className="text-xs text-neutral-600 bg-white px-2.5 py-0.5 rounded-full border border-neutral-200 flex items-center gap-1">
-                      <span>🗓️</span>
-                      <span>{initialOutfit.eventDate}</span>
-                    </span>
-                  )}
-
-                  {initialOutfit.weatherInfo && (
-                    <span className="text-xs text-blue-800 bg-blue-50/90 px-2.5 py-0.5 rounded-full border border-blue-200 flex items-center gap-1.5 font-medium">
-                      <span>{initialOutfit.weatherInfo.icon || '⛅'}</span>
-                      <span>{initialOutfit.weatherInfo.weatherDesc || 'Thời tiết'}</span>
-                      <span className="font-bold">• {initialOutfit.weatherInfo.avgTemp}°C</span>
-                    </span>
-                  )}
+              <div className="min-w-0">
+                <div className="font-bold text-neutral-900 truncate flex items-center gap-2">
+                  <span>{chosenEvent || 'Trải nghiệm cổ phục'}</span>
+                  <span className="text-[11px] font-normal text-neutral-500">• {chosenLocation}</span>
                 </div>
-
-                <div className="p-3 rounded-2xl bg-white/70 border border-amber-200/60 text-xs text-neutral-700 leading-relaxed shadow-2xs">
-                  <div className="font-bold text-neutral-900 text-sm mb-1 text-rose-900 flex items-center gap-1.5">
-                    <span>✨</span>
-                    <span>{initialOutfit.stylingTitle || 'Set đồ tối ưu chuẩn phong cách'}</span>
-                  </div>
-                  <p className="text-neutral-700 text-xs leading-relaxed">
-                    {initialOutfit.aiReasoning || 'Bản phối hài hòa giữa quy chuẩn văn hóa cổ phục và thẩm mỹ trẻ trung, hiện đại.'}
-                  </p>
+                <div className="text-[11px] text-neutral-500 truncate flex items-center gap-2 mt-0.5">
+                  <span>📅 {chosenDate}</span>
+                  <span>• 🌤️ 26°C (Trời đẹp)</span>
                 </div>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={handleResetContext}
+              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-amber-900 hover:text-rose-800 bg-amber-100/70 hover:bg-amber-100 border border-amber-300/60 transition cursor-pointer"
+            >
+              Đổi bối cảnh
+            </button>
           </div>
 
           {/* BOX CHỌN TRANG PHỤC / PHỤ KIỆN */}
-          <section className="bg-white rounded-3xl border border-neutral-200 p-4 lg:p-6 shadow-sm flex flex-col">
+          <section className="bg-white/85 backdrop-blur-md rounded-3xl border border-amber-900/10 p-4 lg:p-6 shadow-md flex flex-col">
             
             {/* GÓC TRÊN CỦA BOX CHỌN TRANG PHỤC/PHỤ KIỆN: "Bạn muốn chọn đồ theo phong cách nào" với 4 options */}
             <div className="mb-5 pb-4 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-rose-600 shrink-0" />
+                <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
                 <span className="text-xs font-bold text-neutral-900 uppercase tracking-wide">
                   Bạn muốn chọn đồ theo phong cách nào?
                 </span>
@@ -3118,10 +5400,10 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
                 <button
                   type="button"
                   onClick={() => applyStyle('codien')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition border flex items-center justify-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                     currentStyle === 'codien'
-                      ? 'bg-rose-700 text-white border-rose-700 shadow-xs'
-                      : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 hover:text-neutral-900'
+                      ? 'bg-neutral-900 text-amber-300 border-black shadow-sm'
+                      : 'bg-[#FAF6EE] text-neutral-700 border-amber-900/15 hover:bg-white hover:text-neutral-950'
                   }`}
                 >
                   <span>📜 Cổ điển</span>
@@ -3129,10 +5411,10 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
                 <button
                   type="button"
                   onClick={() => applyStyle('giaothoa')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition border flex items-center justify-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                     currentStyle === 'giaothoa'
-                      ? 'bg-rose-700 text-white border-rose-700 shadow-xs'
-                      : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 hover:text-neutral-900'
+                      ? 'bg-neutral-900 text-amber-300 border-black shadow-sm'
+                      : 'bg-[#FAF6EE] text-neutral-700 border-amber-900/15 hover:bg-white hover:text-neutral-950'
                   }`}
                 >
                   <span>⚡ Giao thoa</span>
@@ -3140,10 +5422,10 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
                 <button
                   type="button"
                   onClick={() => applyStyle('hiendai')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition border flex items-center justify-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                     currentStyle === 'hiendai'
-                      ? 'bg-rose-700 text-white border-rose-700 shadow-xs'
-                      : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 hover:text-neutral-900'
+                      ? 'bg-neutral-900 text-amber-300 border-black shadow-sm'
+                      : 'bg-[#FAF6EE] text-neutral-700 border-amber-900/15 hover:bg-white hover:text-neutral-950'
                   }`}
                 >
                   <span>👟 Hiện đại</span>
@@ -3151,10 +5433,10 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
                 <button
                   type="button"
                   onClick={() => applyStyle('ngaunhien')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition border flex items-center justify-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                     currentStyle === 'ngaunhien'
-                      ? 'bg-rose-700 text-white border-rose-700 shadow-xs'
-                      : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 hover:text-neutral-900'
+                      ? 'bg-neutral-900 text-amber-300 border-black shadow-sm'
+                      : 'bg-[#FAF6EE] text-neutral-700 border-amber-900/15 hover:bg-white hover:text-neutral-950'
                   }`}
                 >
                   <span>🎲 Ngẫu nhiên</span>
@@ -3258,79 +5540,8 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
                   );
                 })}
               </div>
-
-              {/* TÍNH NĂNG 1: THẺ (CARD) NHỎ "PHÂN TÍCH THẨM MỸ" VỚI ICON 🎨 VÀ KẾT QUẢ ĐÁNH GIÁ MÀU SẮC */}
-              <div className="mt-3 pt-3 border-t border-neutral-200/70">
-                <div className="p-3 rounded-xl bg-white border border-neutral-200 shadow-2xs space-y-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-900">
-                      <span className="text-base leading-none">🎨</span>
-                      <span>Phân tích Thẩm mỹ:</span>
-                      <span className="font-semibold text-neutral-600 truncate">
-                        {topColor.name} + {bottomColor.name}
-                      </span>
-                    </div>
-
-                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold border ${colorHarmony.badgeClass}`}>
-                      {colorHarmony.badge}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-neutral-700 font-medium">
-                    {colorHarmony.fullText}
-                  </p>
-                  
-                  {colorHarmony.vibeTip && (
-                    <p className="text-[11px] text-neutral-500 italic">
-                      💡 {colorHarmony.vibeTip}
-                    </p>
-                  )}
-                </div>
-              </div>
             </div>
           )}
-
-          {/* HÀNG BUTTONS TÍNH NĂNG 2 & 3: LƯU BẢN NHÁP, SO SÁNH VÀ LƯU VÀO LOOKBOOK */}
-          <div className="mb-4 p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Nút Lưu bản nháp */}
-              <button
-                type="button"
-                onClick={handleSaveDraft}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-neutral-800 bg-white hover:bg-neutral-100 border border-neutral-200 shadow-2xs transition cursor-pointer active:scale-95"
-                title="Lưu set đồ hiện tại vào bộ nhớ so sánh tạm thời"
-              >
-                <Bookmark className="w-3.5 h-3.5 text-amber-600" />
-                <span>Lưu bản nháp ({draftOutfits.length}/2)</span>
-              </button>
-
-              {/* Nút So sánh phương án */}
-              <button
-                type="button"
-                onClick={handleOpenCompare}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs ${
-                  draftOutfits.length > 0
-                    ? 'bg-amber-500 hover:bg-amber-600 text-neutral-950 font-extrabold'
-                    : 'bg-neutral-200/70 text-neutral-500 hover:bg-neutral-200'
-                }`}
-                title="Mở modal so sánh song song 2 bản phối"
-              >
-                <Scale className="w-3.5 h-3.5" />
-                <span>So sánh ({draftOutfits.length})</span>
-              </button>
-            </div>
-
-            {/* Nút CTA lớn Lưu vào Lookbook */}
-            <button
-              type="button"
-              onClick={handleOpenSaveLookbook}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-rose-800 to-rose-600 hover:from-rose-900 hover:to-rose-700 shadow-xs hover:shadow transition cursor-pointer active:scale-95"
-              title="Lưu set đồ này vào Lookbook Việt Vibe cá nhân"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Lưu vào Lookbook 📸</span>
-            </button>
-          </div>
 
           {/* DANH SÁCH MÓN ĐỒ THEO TAB */}
           <div className="flex-1 space-y-3 overflow-y-auto max-h-[580px] pr-1">
@@ -3476,6 +5687,7 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
               createdAt: 'Đang mặc trên người'
             }
           }
+          contextEvent={chosenEvent}
           onSelectOutfit={handleApplyDraftOutfit}
           onClose={() => setIsComparing(false)}
           onClearDrafts={() => {
@@ -3564,6 +5776,48 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
           </div>
         </div>
       )}
+
+      {/* TÍNH NĂNG 2: NÚT NỔI FAB HỎI CỐ VẤN AI GEMINI (GÓC DƯỚI BÊN PHẢI) */}
+      {viewMode === 'mix_match' && (
+        <button
+          type="button"
+          onClick={() => setIsAdvisorOpen(true)}
+          className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-rose-800 via-rose-700 to-amber-600 hover:from-rose-900 hover:to-amber-700 text-white font-bold text-xs sm:text-sm pl-4 pr-5 py-3.5 rounded-full shadow-2xl hover:shadow-rose-900/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5 border border-white/25 cursor-pointer group"
+          title="Trò chuyện với Cố vấn AI Gemini về điển tích & chuẩn tắc thời trang"
+        >
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-75" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400" />
+          </span>
+          <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform" />
+          <span className="tracking-wide">Hỏi Cố vấn Gemini ✨</span>
+        </button>
+      )}
+
+      {/* TÍNH NĂNG 2: CHATBOX CỐ VẤN AI GEMINI */}
+      <GeminiAdvisorDrawer
+        isOpen={isAdvisorOpen}
+        onClose={() => setIsAdvisorOpen(false)}
+        currentOutfit={getCurrentOutfitState()}
+        onAutoFixOutfit={handleAutoFixFromAdvisor}
+        onShowToast={showToast}
+      />
+
+      {/* TÍNH NĂNG 3: MODAL GỢI Ý NHÀ CUNG CẤP (VENDOR O2O) */}
+      <VendorRecommendationModal
+        isOpen={isVendorModalOpen}
+        onClose={() => setIsVendorModalOpen(false)}
+        targetOutfit={vendorTargetOutfit || getCurrentOutfitState()}
+        onShowToast={showToast}
+      />
+
+      {/* MODAL TẠO BÀI ĐĂNG CHIA SẺ LÊN CỘNG ĐỒNG */}
+      <ShareToCommunityModal
+        isOpen={isShareToCommunityOpen}
+        onClose={() => setIsShareToCommunityOpen(false)}
+        currentOutfit={getCurrentOutfitState()}
+        onPublish={handlePublishToCommunity}
+      />
     </div>
   );
 }
@@ -3573,6 +5827,10 @@ export function MixMatchScreen({ initialOutfit, onBack }: MixMatchScreenProps) {
 // ==========================================
 interface OnboardingScreenProps {
   onStartRecommendation: (event: string, eventDate: string, location: string, preferredTop: string) => void;
+  hideHeader?: boolean;
+  hasInProgressOutfit?: boolean;
+  currentOutfitDesc?: string;
+  onContinueOutfit?: () => void;
 }
 
 const PRESET_EVENT_TAGS = [
@@ -3585,7 +5843,7 @@ const PRESET_EVENT_TAGS = [
 ];
 
 const PREFERRED_TOP_OPTIONS = [
-  { id: 'auto', label: 'Để AI tự chọn', desc: 'Gemini AI phân tích bối cảnh & thời tiết để chọn loại áo tối ưu' },
+  { id: 'auto', label: 'Để AI tự chọn', desc: 'Chọn loại áo tối ưu theo bối cảnh & thời tiết' },
   { id: 'ao_dai', label: 'Áo dài', desc: 'Áo dài tân thời duyên dáng, thướt tha' },
   { id: 'ao_ngu_than', label: 'Áo ngũ thân', desc: 'Ngũ thân tay chẽn gọn gàng, đĩnh đạc' },
   { id: 'ao_tac', label: 'Áo tấc', desc: 'Lễ phục uy nghiêm, tay thụng rộng sang trọng' },
@@ -3602,26 +5860,13 @@ const POPULAR_LOCATIONS = [
   { id: 'Ninh Bình', name: 'Ninh Bình', badge: 'Cố đô Hoa Lư' },
 ];
 
-function getTomorrowDateString(): string {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  return tomorrow.toISOString().slice(0, 10);
-}
-
-function getTodayDateString(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function getWeekendString(): string {
-  const d = new Date();
-  const day = d.getDay();
-  const daysUntilSaturday = (6 - day + 7) % 7 || 7;
-  const weekend = new Date(d);
-  weekend.setDate(d.getDate() + daysUntilSaturday);
-  return weekend.toISOString().slice(0, 10);
-}
-
-function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
+function OnboardingScreen({ 
+  onStartRecommendation, 
+  hideHeader,
+  hasInProgressOutfit,
+  currentOutfitDesc,
+  onContinueOutfit 
+}: OnboardingScreenProps) {
   const [eventInput, setEventInput] = useState<string>('');
   const [eventDate, setEventDate] = useState<string>(getTomorrowDateString());
   const [location, setLocation] = useState<string>('Hà Nội');
@@ -3690,49 +5935,65 @@ function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 via-amber-50/20 to-neutral-100 flex flex-col font-sans text-neutral-800">
+    <div className="flex-1 bg-gradient-to-b from-neutral-50 via-amber-50/20 to-neutral-100 flex flex-col font-sans text-neutral-800">
       {/* Top minimal header */}
-      <header className="px-4 lg:px-8 py-3.5 flex items-center justify-between border-b border-neutral-200/80 bg-white/90 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-800 via-amber-600 to-amber-400 flex items-center justify-center text-white shadow-xs font-bold text-base">
-            VV
+      {!hideHeader && (
+        <header className="px-4 lg:px-8 py-3.5 flex items-center justify-between border-b border-neutral-200/80 bg-white/90 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-800 via-amber-600 to-amber-400 flex items-center justify-center text-white shadow-xs font-bold text-base">
+              VV
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-neutral-900 font-serif leading-none">
+                Việt Vibe
+              </h1>
+              <span className="text-[10px] text-neutral-500 font-medium">Cổ điển, Tôn trọng, Nét Việt sáng trong</span>
+            </div>
           </div>
-          <div>
-            <h1 className="text-base font-bold text-neutral-900 font-serif leading-none">
-              Việt Vibe
-            </h1>
-            <span className="text-[10px] text-neutral-500 font-medium">Cổ điển, Tôn trọng, Nét Việt sáng trong</span>
-          </div>
-        </div>
-        <div className="text-xs text-neutral-500 hidden sm:block">
-          Bước 1 / 2: Chọn bối cảnh & kiểm tra thời tiết
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main onboarding form */}
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="max-w-2xl w-full bg-white rounded-3xl border border-neutral-200/80 shadow-xl p-6 sm:p-10 space-y-7">
+        <div className="max-w-2xl w-full bg-white/90 backdrop-blur-md rounded-3xl border border-amber-900/10 shadow-xl p-6 sm:p-8 space-y-6">
           {/* Header Title */}
-          <div className="text-center space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200/60 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-rose-600" />
-              Gemini AI Stylist & Dự Báo Thời Tiết Thực Tế
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif text-neutral-900 tracking-tight">
+          <div className="text-center space-y-1">
+            <h2 className="text-2xl sm:text-3xl font-bold font-serif text-neutral-900 tracking-tight">
               Bạn muốn mặc Việt phục đi đâu?
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-500 max-w-lg mx-auto">
-              Nhập sự kiện và chọn ngày diễn ra. AI sẽ kết nối dự báo thời tiết và phân tích quy chuẩn di sản để sáng tạo set đồ Việt Vibe tối ưu nhất.
-            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* PHẦN 1 - GỢI Ý SỰ KIỆN (TAGS/CHIPS) */}
-            <div className="space-y-2.5">
+          {/* BANNER TIẾP TỤC BẢN PHỐI ĐANG DỞ */}
+          {hasInProgressOutfit && onContinueOutfit && (
+            <div className="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-300/80 flex items-center justify-between gap-3 shadow-xs animate-fadeIn">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-xl">👘</span>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-neutral-900 truncate">
+                    Bản phối đang dở: <span className="text-rose-800">{currentOutfitDesc}</span>
+                  </div>
+                  <div className="text-[11px] text-neutral-500 truncate">
+                    Bạn có thể tiếp tục phối bản này mà không cần nhập lại
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={onContinueOutfit}
+                className="px-3.5 py-1.5 rounded-xl bg-neutral-900 hover:bg-black text-amber-300 text-xs font-bold shrink-0 transition shadow-xs cursor-pointer active:scale-95"
+              >
+                Phối tiếp bản dở ↗
+              </button>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* BỐI CẢNH & DỊP XUẤT HIỆN */}
+            <div className="space-y-2">
               <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700">
-                Phần 1: Gợi ý sự kiện
+                Bối cảnh & Dịp xuất hiện
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 mb-2">
                 {PRESET_EVENT_TAGS.map(tag => {
                   const isSelected = eventInput === tag.label;
                   return (
@@ -3740,9 +6001,9 @@ function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
                       key={tag.label}
                       type="button"
                       onClick={() => handleSelectTag(tag.label)}
-                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-rose-700 text-white shadow-xs scale-102 ring-2 ring-rose-700/20'
+                          ? 'bg-rose-700 text-white shadow-xs ring-2 ring-rose-700/20'
                           : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200/80 hover:text-neutral-900'
                       }`}
                     >
@@ -3752,21 +6013,14 @@ function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
                   );
                 })}
               </div>
-            </div>
-
-            {/* PHẦN 2 - TỰ NHẬP SỰ KIỆN (INPUT FIELD) */}
-            <div className="space-y-2">
-              <label htmlFor="custom-event" className="block text-xs font-bold uppercase tracking-wider text-neutral-700">
-                Phần 2: Tự nhập sự kiện
-              </label>
               <div className="relative">
                 <input
                   id="custom-event"
                   type="text"
                   value={eventInput}
                   onChange={e => setEventInput(e.target.value)}
-                  placeholder="Ví dụ: Đi xem concert rap, Đi trà đá vỉa hè, Đi chụp ảnh cổ phong..."
-                  className="w-full px-4 py-3 text-sm sm:text-base rounded-2xl border border-neutral-300 focus:border-rose-600 focus:ring-2 focus:ring-rose-500/20 outline-none transition bg-neutral-50/50 hover:bg-white focus:bg-white text-neutral-900 placeholder:text-neutral-400"
+                  placeholder="Hoặc tự nhập sự kiện (ví dụ: Đi concert rap, Dạo phố Tràng Tiền...)"
+                  className="w-full px-4 py-2.5 text-xs sm:text-sm rounded-xl border border-neutral-300 focus:border-rose-600 focus:ring-2 focus:ring-rose-500/20 outline-none transition bg-neutral-50/50 hover:bg-white focus:bg-white text-neutral-900 placeholder:text-neutral-400"
                 />
                 {eventInput && (
                   <button
@@ -3774,86 +6028,45 @@ function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
                     onClick={() => setEventInput('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-200/60 transition cursor-pointer"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
             </div>
 
-            {/* PHẦN MỚI: CHỌN NGÀY DIỄN RA SỰ KIỆN & ĐỊA ĐIỂM (DÙNG ĐỂ KIỂM TRA THỜI TIẾT) */}
-            <div className="space-y-3 p-4.5 rounded-2xl bg-amber-50/60 border border-amber-200/80">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4 text-amber-700" />
-                  <span>Ngày diễn ra sự kiện & Địa điểm (Kiểm tra thời tiết)</span>
-                </label>
-                <span className="text-[11px] font-medium text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded-md">
-                  Weather API
-                </span>
-              </div>
+            {/* NGÀY & ĐỊA ĐIỂM TỔ CHỨC */}
+            <div className="space-y-2.5 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/80">
+              <label className="text-xs font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-amber-700" />
+                <span>Ngày & Địa điểm</span>
+              </label>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Chọn ngày sự kiện */}
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <label htmlFor="event-date" className="block text-[11px] font-semibold text-neutral-700">
-                    Chọn ngày diễn ra:
+                    Ngày diễn ra:
                   </label>
                   <input
                     id="event-date"
                     type="date"
                     value={eventDate}
                     onChange={e => setEventDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-amber-300/80 bg-white text-sm text-neutral-900 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                    className="w-full px-3 py-2 rounded-xl border border-amber-300/80 bg-white text-xs text-neutral-900 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30"
                   />
-                  {/* Nút bấm nhanh ngày */}
-                  <div className="flex gap-1.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setEventDate(getTodayDateString())}
-                      className={`text-[11px] px-2.5 py-1 rounded-lg border transition cursor-pointer ${
-                        eventDate === getTodayDateString()
-                          ? 'bg-amber-700 text-white border-amber-700'
-                          : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50'
-                      }`}
-                    >
-                      Hôm nay
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEventDate(getTomorrowDateString())}
-                      className={`text-[11px] px-2.5 py-1 rounded-lg border transition cursor-pointer ${
-                        eventDate === getTomorrowDateString()
-                          ? 'bg-amber-700 text-white border-amber-700'
-                          : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50'
-                      }`}
-                    >
-                      Ngày mai
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEventDate(getWeekendString())}
-                      className={`text-[11px] px-2.5 py-1 rounded-lg border transition cursor-pointer ${
-                        eventDate === getWeekendString()
-                          ? 'bg-amber-700 text-white border-amber-700'
-                          : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50'
-                      }`}
-                    >
-                      Cuối tuần
-                    </button>
-                  </div>
                 </div>
 
                 {/* Chọn địa điểm tổ chức */}
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <label htmlFor="event-location" className="block text-[11px] font-semibold text-neutral-700 flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-neutral-500" />
-                    <span>Địa điểm / Thành phố:</span>
+                    <span>Địa điểm:</span>
                   </label>
                   <select
                     id="event-location"
                     value={location}
                     onChange={e => setLocation(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-amber-300/80 bg-white text-sm text-neutral-900 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                    className="w-full px-3 py-2 rounded-xl border border-amber-300/80 bg-white text-xs text-neutral-900 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30"
                   >
                     {POPULAR_LOCATIONS.map(loc => (
                       <option key={loc.id} value={loc.name}>
@@ -3861,50 +6074,47 @@ function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
                       </option>
                     ))}
                   </select>
-                  <p className="text-[11px] text-neutral-500 leading-tight pt-1">
-                    Hệ thống sẽ gọi API thời tiết theo tọa độ thực tế của địa điểm này.
-                  </p>
                 </div>
               </div>
 
-              {/* Hộp Preview thời tiết trực tiếp */}
-              <div className="mt-2.5 p-3 rounded-xl bg-white/90 border border-amber-200 flex items-center justify-between shadow-2xs">
+              {/* Hộp Preview thời tiết cơ bản */}
+              <div className="mt-2 p-2.5 rounded-xl bg-white/95 border border-amber-200/80 flex items-center justify-between shadow-2xs">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-lg shrink-0">
-                    {isLoadingWeather ? <Loader2 className="w-4 h-4 text-sky-600 animate-spin" /> : (weatherPreview?.icon || '🌤️')}
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-lg shrink-0 border border-amber-200/60">
+                    {isLoadingWeather ? <Loader2 className="w-3.5 h-3.5 text-amber-700 animate-spin" /> : (weatherPreview?.icon || '🌤️')}
                   </div>
                   <div className="min-w-0">
                     <div className="text-xs font-bold text-neutral-900 truncate">
-                      {location} • {eventDate}
-                    </div>
-                    <div className="text-[11px] text-neutral-600 truncate">
                       {isLoadingWeather
                         ? 'Đang kiểm tra thời tiết...'
-                        : `${weatherPreview?.weatherDesc || 'Nắng nhẹ'} • Nhiệt độ: ${weatherPreview?.avgTemp || 26}°C • Mưa: ${weatherPreview?.rainProb || 0}%`}
+                        : (weatherPreview?.weatherDesc || 'Trời nắng nhẹ, mát mẻ')}
+                    </div>
+                    <div className="text-[10px] text-neutral-500 truncate">
+                      {isLoadingWeather ? 'Vui lòng đợi' : `Xác suất mưa: ${weatherPreview?.rainProb ?? 0}%`}
                     </div>
                   </div>
                 </div>
                 <div className="text-right shrink-0 pl-2">
-                  <span className="text-xs font-bold text-amber-900">
+                  <span className="text-xs sm:text-sm font-extrabold text-amber-900 font-serif">
                     {weatherPreview ? `${weatherPreview.avgTemp}°C` : '26°C'}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* PHẦN 3 - SỞ THÍCH TRANG PHỤC (DROPDOWN/RADIO) */}
-            <div className="space-y-2.5">
+            {/* LOẠI ÁO MONG MUỐN */}
+            <div className="space-y-2">
               <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700">
-                Phần 3: Sở thích trang phục
+                Loại áo mong muốn
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {PREFERRED_TOP_OPTIONS.map(opt => {
                   const isChecked = preferredTop === opt.id;
                   return (
                     <label
                       key={opt.id}
                       onClick={() => setPreferredTop(opt.id)}
-                      className={`flex items-start gap-3 p-3 rounded-2xl border transition-all cursor-pointer ${
+                      className={`flex items-start gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer ${
                         isChecked
                           ? 'border-amber-600 bg-amber-50/70 shadow-xs ring-1 ring-amber-600/30'
                           : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50/50'
@@ -3916,13 +6126,13 @@ function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
                         value={opt.id}
                         checked={isChecked}
                         onChange={() => setPreferredTop(opt.id)}
-                        className="mt-0.5 text-rose-700 focus:ring-rose-500 h-4 w-4"
+                        className="mt-0.5 text-rose-700 focus:ring-rose-500 h-3.5 w-3.5"
                       />
-                      <div className="flex-1">
-                        <div className="text-xs sm:text-sm font-semibold text-neutral-900">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-semibold text-neutral-900">
                           {opt.label}
                         </div>
-                        <div className="text-[11px] text-neutral-500 leading-snug mt-0.5">
+                        <div className="text-[10px] text-neutral-500 truncate mt-0.5">
                           {opt.desc}
                         </div>
                       </div>
@@ -3932,23 +6142,23 @@ function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
               </div>
             </div>
 
-            {/* NÚT CTA: AI GỢI Ý TRANG PHỤC */}
-            <div className="pt-2">
+            {/* NÚT CTA: TẠO BẢN PHỐI */}
+            <div className="pt-1">
               <button
                 type="submit"
                 disabled={!isFormValid}
-                className={`w-full py-3.5 px-6 rounded-2xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${
+                className={`w-full py-3 px-6 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
                   isFormValid
-                    ? 'bg-gradient-to-r from-rose-700 via-rose-600 to-amber-600 hover:from-rose-800 hover:to-amber-700 text-white shadow-lg shadow-rose-900/20 active:scale-[0.99] cursor-pointer'
+                    ? 'bg-gradient-to-r from-rose-800 via-rose-700 to-amber-700 hover:from-rose-900 hover:to-amber-800 text-white shadow-md active:scale-[0.99] cursor-pointer'
                     : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
                 }`}
               >
-                <Sparkles className="w-5 h-5" />
-                <span>AI Gợi ý Trang Phục (Phân tích Bối cảnh & Thời tiết)</span>
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Tạo bản phối trang phục</span>
               </button>
               {!isFormValid && (
-                <p className="text-center text-xs text-neutral-400 mt-2">
-                  * Vui lòng chọn hoặc tự nhập bối cảnh sự kiện và chọn ngày để kích hoạt nút gợi ý
+                <p className="text-center text-[11px] text-neutral-400 mt-1.5">
+                  * Vui lòng chọn hoặc tự nhập bối cảnh để tiếp tục
                 </p>
               )}
             </div>
@@ -3960,77 +6170,38 @@ function OnboardingScreen({ onStartRecommendation }: OnboardingScreenProps) {
 }
 
 // ==========================================
-// MÀN HÌNH 2: LOADING (GEMINI AI & WEATHER ANALYZING)
+// MÀN HÌNH 2: LOADING (GEMINI AI & WEATHER ANALYZING) - TỐI GIẢN
 // ==========================================
 function LoadingScreen({ 
   eventText, 
-  eventDate, 
   location 
 }: { 
   eventText: string; 
-  eventDate: string; 
+  eventDate?: string; 
   location: string;
 }) {
-  const [stepIndex, setStepIndex] = useState<number>(0);
-
-  React.useEffect(() => {
-    const t1 = setTimeout(() => setStepIndex(1), 700);
-    const t2 = setTimeout(() => setStepIndex(2), 1400);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, []);
-
-  const steps = [
-    { text: `Đang gọi API thời tiết kiểm tra ngày ${eventDate} tại ${location}...`, icon: CloudSun },
-    { text: 'Đang gửi dữ liệu bối cảnh và quy chuẩn di sản đến Gemini AI...', icon: BookOpen },
-    { text: 'Gemini AI đang sáng tạo bản phối Việt Vibe hoàn hảo...', icon: Sparkles },
-  ];
-
-  const CurrentIcon = steps[stepIndex]?.icon || Sparkles;
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 via-amber-50/30 to-neutral-100 flex flex-col items-center justify-center p-6 text-center font-sans">
-      <div className="bg-white rounded-3xl p-8 sm:p-12 border border-neutral-200/80 shadow-2xl max-w-md w-full flex flex-col items-center">
-        <div className="relative mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-800 via-amber-600 to-amber-400 flex items-center justify-center text-white shadow-md animate-bounce">
-            <CurrentIcon className="w-8 h-8" />
+    <div className="flex-1 bg-gradient-to-b from-[#FAF6EE] via-amber-50/20 to-[#FAF6EE] flex flex-col items-center justify-center p-6 text-center font-sans py-20 animate-fadeIn">
+      <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 sm:p-10 border border-amber-900/10 shadow-xl max-w-sm w-full flex flex-col items-center space-y-5">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-900 via-rose-800 to-amber-600 flex items-center justify-center text-white shadow-lg animate-pulse">
+            <Sparkles className="w-8 h-8 text-amber-300" />
           </div>
-          <div className="absolute -inset-2 rounded-3xl bg-rose-500/10 animate-ping -z-10" />
+          <div className="absolute -inset-1.5 rounded-3xl bg-amber-500/20 animate-ping -z-10" />
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-bold font-serif text-neutral-900 mb-2">
-          AI đang phân tích bối cảnh và chọn trang phục...
-        </h2>
-
-        <p className="text-xs sm:text-sm text-neutral-500 mb-4">
-          Tích hợp dữ liệu thời tiết thực tế và quy chuẩn di sản cổ phục cho:
-        </p>
-
-        <div className="space-y-1.5 w-full mb-5">
-          <div className="px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-semibold text-sm max-w-full truncate shadow-2xs">
-            "{eventText || 'Bối cảnh sự kiện'}"
-          </div>
-          <div className="flex items-center justify-center gap-2 text-xs text-neutral-500">
-            <span>📅 {eventDate}</span>
-            <span>•</span>
-            <span>📍 {location}</span>
-          </div>
-        </div>
-
-        {/* Dynamic step info */}
-        <div className="w-full text-left p-3 rounded-xl bg-neutral-50 border border-neutral-200/60 mb-5 text-xs text-neutral-700 flex items-center gap-2">
-          <Loader2 className="w-4 h-4 text-rose-700 animate-spin shrink-0" />
-          <span className="font-medium animate-fadeIn">{steps[stepIndex]?.text}</span>
+        <div className="space-y-1.5">
+          <h2 className="text-xl sm:text-2xl font-bold font-serif text-neutral-900">
+            Đang sáng tạo bản phối...
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-500 font-medium">
+            "{eventText || 'Bối cảnh sự kiện'}" • {location}
+          </p>
         </div>
 
         {/* Loading Progress Bar */}
-        <div className="w-full bg-neutral-100 h-2.5 rounded-full overflow-hidden relative">
-          <div 
-            className="bg-gradient-to-r from-rose-700 via-amber-500 to-rose-700 h-full rounded-full transition-all duration-700 ease-out"
-            style={{ width: stepIndex === 0 ? '35%' : stepIndex === 1 ? '70%' : '95%' }}
-          />
+        <div className="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden relative">
+          <div className="bg-gradient-to-r from-rose-700 via-amber-500 to-rose-700 h-full w-full rounded-full animate-pulse" />
         </div>
       </div>
     </div>
@@ -4041,92 +6212,7 @@ function LoadingScreen({
 // ROOT COMPONENT: QUẢN LÝ LUỒNG CHUYỂN MÀN HÌNH
 // ==========================================
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('ONBOARDING');
-  const [chosenEvent, setChosenEvent] = useState<string>('');
-  const [chosenDate, setChosenDate] = useState<string>(getTomorrowDateString());
-  const [chosenLocation, setChosenLocation] = useState<string>('Hà Nội');
-  const [initialOutfit, setInitialOutfit] = useState<OutfitRecommendation>({
-    top: 'ao_ngu_than',
-    bottom: 'quan_jeans',
-    shoes: 'sneaker_low',
-    accessories: ['tai_nghe', 'kinh_ram'],
-  });
-
-  const handleStartRecommendation = async (
-    event: string, 
-    eventDate: string, 
-    location: string, 
-    preferredTop: string
-  ) => {
-    setChosenEvent(event);
-    setChosenDate(eventDate);
-    setChosenLocation(location);
-    setCurrentScreen('LOADING');
-
-    const startTime = Date.now();
-
-    try {
-      // Gọi API full-stack: kiểm tra thời tiết + phân tích Gemini AI
-      const res = await fetch('/api/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event,
-          eventDate,
-          location,
-          preferredTop,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.outfit) {
-          // Đảm bảo loading hiển thị tối thiểu 1.2s để người dùng quan sát hiệu ứng phân tích
-          const elapsed = Date.now() - startTime;
-          const remainingDelay = Math.max(0, 1400 - elapsed);
-          setTimeout(() => {
-            setInitialOutfit(data.outfit);
-            setCurrentScreen('MIX_MATCH');
-          }, remainingDelay);
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn('Backend API unavailable, using client-side fallback:', err);
-    }
-
-    // Dự phòng khi gọi API mạng gặp lỗi hoặc chạy preview client-only
-    setTimeout(() => {
-      const fallbackOutfit = mockAIEngine(event, eventDate, location, preferredTop);
-      setInitialOutfit(fallbackOutfit);
-      setCurrentScreen('MIX_MATCH');
-    }, 1800);
-  };
-
-  const handleBackToOnboarding = () => {
-    setCurrentScreen('ONBOARDING');
-  };
-
-  if (currentScreen === 'ONBOARDING') {
-    return <OnboardingScreen onStartRecommendation={handleStartRecommendation} />;
-  }
-
-  if (currentScreen === 'LOADING') {
-    return (
-      <LoadingScreen 
-        eventText={chosenEvent} 
-        eventDate={chosenDate} 
-        location={chosenLocation} 
-      />
-    );
-  }
-
-  return (
-    <MixMatchScreen
-      initialOutfit={initialOutfit}
-      onBack={handleBackToOnboarding}
-    />
-  );
+  return <MixMatchScreen />;
 }
 
 // --- ITEM CARD COMPONENT ---
